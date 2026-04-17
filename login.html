@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriNet AI — Login</title>
+  <meta name="description" content="Sign in to AgriNet AI — Smart farming intelligence for Indian farmers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Outfit', sans-serif;
+      --primary: #1A8D68;
+      --primary-dark: #0E5F46;
+      --primary-light: #E8F5F0;
+      --bg: #F5F7F6;
+      --card: #FFFFFF;
+      --text: #1A1D21;
+      --text-sec: #5F6B7A;
+      --border: #DFE3E8;
+      --danger: #D64545;
+      --danger-bg: #FBEAEA;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      animation: containerIn 0.5s ease;
+    }
+    @keyframes containerIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo {
+      width: 56px; height: 56px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, #1A8D68, #0E5F46);
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(26, 141, 104, 0.3);
+    }
+    .login-logo svg { width: 28px; height: 28px; fill: white; }
+    .login-header h1 {
+      font-family: var(--font-display);
+      font-size: 26px; font-weight: 700; color: var(--text);
+      margin-bottom: 6px;
+    }
+    .login-header p { font-size: 14px; color: var(--text-sec); }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex; gap: 4px; margin-bottom: 28px;
+      background: var(--bg); padding: 4px; border-radius: 10px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px; border: none; border-radius: 8px;
+      background: transparent; font-family: var(--font-sans);
+      font-size: 14px; font-weight: 500; color: var(--text-sec);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .auth-tab.active {
+      background: var(--card); color: var(--primary);
+      font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* Forms */
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: var(--bg);
+      font-family: var(--font-sans); font-size: 14px; color: var(--text);
+      outline: none; transition: all 0.2s;
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,141,104,0.1); background: #fff; }
+    .form-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(214,69,69,0.1); }
+    .form-input::placeholder { color: #A0A9B4; }
+
+    .password-wrap {
+      position: relative;
+    }
+    .password-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-sec); cursor: pointer;
+      font-size: 14px; padding: 4px;
+    }
+    .password-toggle:hover { color: var(--text); }
+
+    .submit-btn {
+      width: 100%; padding: 13px; border: none; border-radius: 10px;
+      background: linear-gradient(135deg, #1A8D68, #0E5F46);
+      color: white; font-family: var(--font-sans); font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 12px rgba(26,141,104,0.25);
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,141,104,0.35); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      background: var(--danger-bg);
+      color: var(--danger);
+      font-size: 13px; font-weight: 500;
+      padding: 10px 14px; border-radius: 8px;
+      margin-bottom: 16px; display: none;
+      border: 1px solid rgba(214,69,69,0.15);
+    }
+    .error-msg.show { display: flex; align-items: center; gap: 8px; }
+
+    .lang-select-wrap {
+      text-align: center; margin-top: 20px;
+    }
+    .lang-select-wrap select {
+      padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg); font-family: var(--font-sans); font-size: 13px;
+      color: var(--text); outline: none; cursor: pointer;
+    }
+
+    .footer-note {
+      text-align: center; margin-top: 24px;
+      font-size: 12px; color: var(--text-sec);
+    }
+    .footer-note i { color: var(--primary); }
+
+    /* Strength meter */
+    .password-strength {
+      height: 3px; border-radius: 2px; margin-top: 8px;
+      background: var(--border); overflow: hidden;
+    }
+    .password-strength-bar {
+      height: 100%; border-radius: 2px; transition: all 0.3s;
+      width: 0%;
+    }
+    .strength-weak { width: 33%; background: var(--danger); }
+    .strength-medium { width: 66%; background: #F59E0B; }
+    .strength-strong { width: 100%; background: var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24"><path d="M17.5 12c0 1.9-.7 3.6-1.8 5H21v2H3v-2h5.3A8.5 8.5 0 014 12c0-4.4 3.6-8 8-8 1.6 0 3 .4 4.3 1.2L15 6.5a6 6 0 100 11l1.3 1.3c1.3-.9 2.2-2.4 2.2-4.1h-4V13h5a8 8 0 01-2 2.7"/></svg>
+      </div>
+      <h1 id="auth-title">Welcome to AgriNet AI</h1>
+      <p id="auth-subtitle">Smart farming intelligence for Indian farmers</p>
+    </div>
+
+    <div class="login-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <div id="error-box" class="error-msg">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="error-text"></span>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form class="auth-form active" id="form-login" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email address</label>
+          <input class="form-input" id="login-email" type="email" placeholder="you@email.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <div class="password-wrap">
+            <input class="form-input" id="login-password" type="password" placeholder="Enter password" required autocomplete="current-password">
+            <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form class="auth-form" id="form-signup" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label class="form-label" for="signup-name">Full name</label>
+          <input class="form-input" id="signup-name" type="text" placeholder="Enter your full name" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-email">Email address</label>
+          <input class="form-input" id="signup-email" type="email" placeholder="you@email.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-phone">Phone number (optional)</label>
+          <input class="form-input" id="signup-phone" type="tel" placeholder="+91 XXXXX XXXXX" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-password">Password</label>
+          <div class="password-wrap">
+            <input class="form-input" id="signup-password" type="password" placeholder="Min 6 characters" required autocomplete="new-password" oninput="checkStrength(this.value)">
+            <button type="button" class="password-toggle" onclick="togglePassword('signup-password', this)">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <div class="password-strength"><div class="password-strength-bar" id="strength-bar"></div></div>
+        </div>
+        <button type="submit" class="submit-btn" id="signup-btn">
+          <i class="fa-solid fa-user-plus"></i> Create Account
+        </button>
+      </form>
+
+      <div class="lang-select-wrap">
+        <select id="login-lang" onchange="setLoginLang(this.value)">
+          <option value="en">🌐 English</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="mr">🇮🇳 मराठी</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <i class="fa-solid fa-lock"></i> Your data is encrypted and secure · © 2024 AgriNet AI
+    </div>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    (function() {
+      const token = localStorage.getItem('agrinet_token');
+      if (token) {
+        // Quick verify
+        fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+          .then(r => { if (r.ok) window.location.href = '/app'; })
+          .catch(() => {});
+      }
+    })();
+
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('form-' + tab).classList.add('active');
+      hideError();
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('error-box');
+      document.getElementById('error-text').textContent = msg;
+      box.classList.add('show');
+    }
+    function hideError() {
+      document.getElementById('error-box').classList.remove('show');
+    }
+
+    function togglePassword(id, btn) {
+      const input = document.getElementById(id);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function checkStrength(pw) {
+      const bar = document.getElementById('strength-bar');
+      bar.className = 'password-strength-bar';
+      if (pw.length >= 10) bar.classList.add('strength-strong');
+      else if (pw.length >= 6) bar.classList.add('strength-medium');
+      else if (pw.length >= 1) bar.classList.add('strength-weak');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideError();
+      const btn = document.getElementById('login-btn');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email || !password) { showError('Please fill in all fields.'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in…';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { showError(data.error || 'Login failed.'); return; }
+
+        localStorage.setItem('agrinet_token', data.token);
+        localStorage.setItem('agrinet_user', JSON.stringify(data.user));
+        window.location.href = '/app';
+      } catch (err) {
+        showError('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+      }
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      hideError();
+      const btn = document.getElementById('signup-btn');
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const phone = document.getElementById('signup-phone').value.trim();
+      const password = document.getElementById('signup-password').value;
+
+      if (!name || name.length < 2) { showError('Name must be at least 2 characters.'); return; }
+      if (!email) { showError('Email is required.'); return; }
+      if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account…';
+
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, password, language: document.getElementById('login-lang').value })
+        });
+        const data = await res.json();
+        if (!res.ok) { showError(data.error || 'Signup failed.'); return; }
+
+        localStorage.setItem('agrinet_token', data.token);
+        localStorage.setItem('agrinet_user', JSON.stringify(data.user));
+        window.location.href = '/app';
+      } catch (err) {
+        showError('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+      }
+    }
+
+    function setLoginLang(lang) {
+      // Simple labels for login page
+      const t = {
+        en: { title: 'Welcome to AgriNet AI', sub: 'Smart farming intelligence for Indian farmers', login: 'Sign In', signup: 'Create Account' },
+        hi: { title: 'एग्रीनेट एआई में आपका स्वागत है', sub: 'भारतीय किसानों के लिए स्मार्ट खेती बुद्धिमत्ता', login: 'साइन इन करें', signup: 'खाता बनाएं' },
+        mr: { title: 'अॅग्रीनेट एआय मध्ये स्वागत आहे', sub: 'भारतीय शेतकऱ्यांसाठी स्मार्ट शेती बुद्धिमत्ता', login: 'साइन इन करा', signup: 'खाते तयार करा' }
+      };
+      const tr = t[lang] || t.en;
+      document.getElementById('auth-title').textContent = tr.title;
+      document.getElementById('auth-subtitle').textContent = tr.sub;
+      document.getElementById('tab-login').textContent = tr.login;
+      document.getElementById('tab-signup').textContent = tr.signup;
+    }
+  </script>
+</body>
+</html>

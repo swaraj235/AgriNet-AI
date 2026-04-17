@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriNet AI — Mobile App</title>
+  <meta name="description" content="AgriNet AI Flutter mobile app UI for Indian farmers">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --green:#1A8D68;--green-dark:#0E5F46;--green-light:#E8F5F0;
+      --warn:#E8A838;--danger:#C14646;--info:#2563EB;
+      --bg:#F0F4F2;--card:#fff;--text:#1A1D21;--sec:#5F6B7A;
+      --border:#DFE3E8;--radius:16px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#1A1D21;min-height:100vh;
+      display:flex;align-items:center;justify-content:center;padding:20px;}
+    h1,h2,h3,.brand{font-family:'Outfit',sans-serif}
+
+    /* === Device Frame === */
+    .device-wrap{position:relative;display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap;justify-content:center}
+    .device{
+      width:375px;height:750px;background:#101114;border-radius:44px;
+      padding:12px;box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 2px #2a2d35,inset 0 0 0 1px rgba(255,255,255,0.06);
+      position:relative;flex-shrink:0;
+    }
+    .notch{
+      position:absolute;top:0;left:50%;transform:translateX(-50%);
+      width:120px;height:28px;background:#101114;border-radius:0 0 18px 18px;z-index:10;
+    }
+    .screen{
+      width:100%;height:100%;border-radius:34px;overflow:hidden;
+      background:var(--bg);display:flex;flex-direction:column;position:relative;
+    }
+
+    /* === Status Bar === */
+    .status-bar{
+      height:44px;background:var(--green);display:flex;align-items:flex-end;
+      justify-content:space-between;padding:0 20px 8px;flex-shrink:0;padding-top:28px;
+    }
+    .status-bar span{color:rgba(255,255,255,0.9);font-size:12px;font-weight:600}
+
+    /* === App Bar === */
+    .app-bar{
+      background:var(--green);padding:10px 18px 18px;
+      display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+    }
+    .app-bar .logo-row{display:flex;align-items:center;gap:10px}
+    .app-bar .app-icon{width:32px;height:32px;background:rgba(255,255,255,0.2);
+      border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .app-bar .brand{color:white;font-size:18px;font-weight:700;letter-spacing:-0.3px}
+    .app-bar .tagline{color:rgba(255,255,255,0.75);font-size:11px;margin-top:1px}
+    .app-bar .avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.2);
+      color:white;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .app-bar .bell-btn{color:rgba(255,255,255,0.85);font-size:18px;cursor:pointer;
+      width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.1);
+      display:flex;align-items:center;justify-content:center;border:none}
+
+    /* === Scroll Content === */
+    .scroll-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px;
+      display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+    .scroll-body::-webkit-scrollbar{display:none}
+
+    /* === KPI Row === */
+    .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kpi{background:var(--card);border-radius:14px;padding:12px;
+      box-shadow:0 1px 6px rgba(0,0,0,0.06)}
+    .kpi .kpi-label{font-size:10px;color:var(--sec);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+    .kpi .kpi-val{font-size:22px;font-family:'Outfit',sans-serif;font-weight:700;color:var(--text);margin:4px 0 2px}
+    .kpi .kpi-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;display:inline-block}
+    .badge-green{background:rgba(26,141,104,0.1);color:var(--green)}
+    .badge-blue{background:rgba(37,99,235,0.1);color:var(--info)}
+    .badge-warn{background:rgba(232,168,56,0.1);color:var(--warn)}
+
+    /* === Section Header === */
+    .sec-header{display:flex;align-items:center;justify-content:space-between}
+    .sec-title{font-size:14px;font-weight:700;color:var(--text)}
+    .sec-more{font-size:12px;color:var(--green);font-weight:600;cursor:pointer;border:none;background:none}
+
+    /* === Crop Cards Scroll === */
+    .h-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+    .h-scroll::-webkit-scrollbar{display:none}
+    .crop-card{
+      min-width:130px;background:var(--card);border-radius:14px;padding:12px;
+      box-shadow:0 1px 6px rgba(0,0,0,0.06);cursor:pointer;flex-shrink:0;
+      border:1.5px solid transparent;transition:border-color 0.2s;
+    }
+    .crop-card:hover{border-color:var(--green)}
+    .crop-card.active{border-color:var(--green);background:var(--green-light)}
+    .crop-icon{font-size:24px;margin-bottom:6px}
+    .crop-name{font-size:13px;font-weight:700;color:var(--text)}
+    .crop-price{font-size:12px;color:var(--green);font-weight:600;margin-top:2px}
+    .crop-trend{font-size:11px;color:var(--sec)}
+
+    /* === AI Recommendation Box === */
+    .ai-box{
+      background:linear-gradient(135deg,var(--green),var(--green-dark));
+      border-radius:var(--radius);padding:16px;color:white;position:relative;overflow:hidden;
+    }
+    .ai-box::before{
+      content:'🤖';position:absolute;right:-10px;bottom:-10px;font-size:72px;opacity:0.12;
+    }
+    .ai-box .ai-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.75}
+    .ai-box .ai-crop{font-size:22px;font-family:'Outfit',sans-serif;font-weight:800;margin:4px 0}
+    .ai-box .ai-profit{font-size:13px;opacity:0.9}
+    .ai-box .ai-conf{
+      display:inline-flex;align-items:center;gap:5px;margin-top:10px;
+      background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600
+    }
+    .ai-box .ai-btn{
+      margin-top:14px;background:white;color:var(--green);border:none;border-radius:10px;
+      padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;
+    }
+
+    /* === Demand Mini Chart === */
+    .mini-chart-box{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 1px 6px rgba(0,0,0,0.06)}
+    .chart-bars{display:flex;align-items:flex-end;gap:5px;height:60px;margin-top:10px}
+    .chart-bar{flex:1;background:var(--green-light);border-radius:4px 4px 0 0;transition:height 0.8s cubic-bezier(0.23,1,0.32,1)}
+    .chart-bar.active{background:var(--green)}
+    .chart-labels{display:flex;gap:5px;margin-top:4px}
+    .chart-label{flex:1;font-size:9px;color:var(--sec);text-align:center}
+
+    /* === Alert Box === */
+    .alert-card{
+      border-radius:var(--radius);padding:12px 14px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .alert-card.danger{background:rgba(193,70,70,0.08);border:1px solid rgba(193,70,70,0.2)}
+    .alert-card.warn{background:rgba(232,168,56,0.08);border:1px solid rgba(232,168,56,0.2)}
+    .alert-card.success{background:rgba(26,141,104,0.08);border:1px solid rgba(26,141,104,0.2)}
+    .alert-icon{font-size:20px;flex-shrink:0}
+    .alert-title{font-size:13px;font-weight:700;color:var(--text)}
+    .alert-body{font-size:11px;color:var(--sec);margin-top:2px;line-height:1.4}
+
+    /* === Voice Widget === */
+    .voice-widget{
+      background:linear-gradient(135deg,#1E1B4B,#312E81);
+      border-radius:var(--radius);padding:16px;text-align:center;color:white;
+    }
+    .mic-ring{
+      width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.1);
+      display:flex;align-items:center;justify-content:center;font-size:26px;
+      margin:0 auto 10px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;
+      transition:all 0.2s;animation:micPulse 2s ease-in-out infinite;
+    }
+    @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.2)}50%{box-shadow:0 0 0 12px rgba(255,255,255,0)}}
+    .voice-title{font-size:14px;font-weight:700}
+    .voice-sub{font-size:11px;opacity:0.7;margin-top:3px}
+    .voice-bubble{
+      margin-top:12px;background:rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;
+      font-size:12px;text-align:left;line-height:1.5;
+    }
+
+    /* === Bottom Nav === */
+    .bottom-nav{
+      background:var(--card);border-top:1px solid var(--border);
+      display:flex;justify-content:space-around;padding:10px 0 16px;flex-shrink:0;
+    }
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
+      color:var(--sec);font-size:10px;font-weight:600;transition:color 0.15s;border:none;background:none;padding:0 10px}
+    .nav-item.active{color:var(--green)}
+    .nav-item i{font-size:18px}
+
+    /* === Screens === */
+    .screen-content{display:none}
+    .screen-content.active{display:flex;flex-direction:column;flex:1;overflow:hidden}
+
+    /* === Crop AI Screen === */
+    .form-box{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 1px 6px rgba(0,0,0,0.06)}
+    .f-label{font-size:11px;color:var(--sec);font-weight:600;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+    .f-select{
+      width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;
+      background:var(--bg);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;
+      margin-bottom:10px;appearance:none;
+    }
+    .f-select:focus{border-color:var(--green)}
+    .run-btn{
+      width:100%;background:var(--green);color:white;border:none;border-radius:12px;
+      padding:13px;font-size:14px;font-weight:700;cursor:pointer;display:flex;
+      align-items:center;justify-content:center;gap:8px;font-family:'Inter',sans-serif;
+      box-shadow:0 4px 14px rgba(26,141,104,0.35);transition:all 0.2s;margin-top:4px;
+    }
+    .run-btn:disabled{opacity:0.6;cursor:not-allowed}
+    .run-btn:hover:not(:disabled){background:var(--green-dark);box-shadow:0 6px 18px rgba(26,141,104,0.45)}
+    .result-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    .result-item{
+      background:var(--card);border-radius:12px;padding:12px;
+      display:flex;align-items:center;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,0.06);
+      border:1.5px solid transparent;
+    }
+    .result-item.top{border-color:var(--green);background:var(--green-light)}
+    .result-rank{width:28px;height:28px;border-radius:8px;background:var(--green-light);
+      color:var(--green);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .result-item.top .result-rank{background:var(--green);color:white}
+    .result-crop-name{font-size:13px;font-weight:700;color:var(--text)}
+    .result-profit{font-size:12px;color:var(--green);font-weight:600}
+    .result-score{margin-left:auto;font-size:20px;font-family:'Outfit',sans-serif;font-weight:700;color:var(--green)}
+    .conf-bar{height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
+    .conf-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.8s}
+
+    /* === Spinner === */
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .fa-spin{animation:spin 0.8s linear infinite}
+
+    /* === Panel labels === */
+    .panel-label{
+      background:rgba(26,141,104,0.08);border:1px solid rgba(26,141,104,0.2);
+      border-radius:8px;padding:4px 10px;font-size:11px;color:var(--green);font-weight:600;
+      display:inline-flex;align-items:center;gap:5px;
+    }
+
+    /* === Side Info === */
+    .side-info{color:white;max-width:340px}
+    .side-info h1{font-size:36px;font-weight:800;line-height:1.2;margin-bottom:16px}
+    .side-info p{font-size:15px;opacity:0.75;line-height:1.6;margin-bottom:24px}
+    .tech-tags{display:flex;flex-wrap:wrap;gap:8px}
+    .tech-tag{
+      background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+      border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;
+      color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:6px;
+    }
+    .screens-note{
+      margin-top:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+      border-radius:16px;padding:20px;
+    }
+    .screens-note h3{font-size:16px;font-weight:700;color:white;margin-bottom:12px}
+    .screen-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+    .screen-item:last-child{border-bottom:none}
+    .screen-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+    .screen-item span{font-size:13px;color:rgba(255,255,255,0.75)}
+  </style>
+</head>
+<body>
+
+<div class="device-wrap">
+  <!-- Left: Info Panel -->
+  <div class="side-info">
+    <div class="panel-label"><i class="fa-brands fa-flutter"></i> Flutter Mobile App</div>
+    <h1 style="margin-top:16px">AgriNet AI<br>Mobile</h1>
+    <p>Cross-platform mobile application for Android/iOS. Built with Flutter, connected to the AgriNet FastAPI ML backend. Designed for farmers in rural environments with minimal data literacy.</p>
+    <div class="tech-tags">
+      <div class="tech-tag"><i class="fa-brands fa-flutter" style="color:#54C5F8"></i> Flutter / Dart</div>
+      <div class="tech-tag"><i class="fa-solid fa-bolt" style="color:#F6C90E"></i> FastAPI Backend</div>
+      <div class="tech-tag"><i class="fa-solid fa-robot" style="color:#A78BFA"></i> ML Models</div>
+      <div class="tech-tag"><i class="fa-solid fa-microphone" style="color:#FB923C"></i> Voice AI</div>
+      <div class="tech-tag"><i class="fa-solid fa-language" style="color:#34D399"></i> Hindi / Marathi</div>
+    </div>
+    <div class="screens-note">
+      <h3>App Screens</h3>
+      <div class="screen-item"><div class="screen-dot"></div><span>Dashboard — KPIs + Demand Chart</span></div>
+      <div class="screen-item"><div class="screen-dot"></div><span>Crop AI — ML Recommendation</span></div>
+      <div class="screen-item"><div class="screen-dot"></div><span>Transport Pool — Cost Optimizer</span></div>
+      <div class="screen-item"><div class="screen-dot"></div><span>Voice AI — Hindi/Marathi Chatbot</span></div>
+      <div class="screen-item"><div class="screen-dot"></div><span>Blockchain — Supply Chain Trace</span></div>
+    </div>
+  </div>
+
+  <!-- Right: Device Frame -->
+  <div class="device">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <span><i class="fa-solid fa-signal"></i> &nbsp;<i class="fa-solid fa-wifi"></i> &nbsp;<i class="fa-solid fa-battery-full"></i></span>
+      </div>
+
+      <!-- App Bar -->
+      <div class="app-bar">
+        <div class="logo-row">
+          <div class="app-icon">🌱</div>
+          <div>
+            <div class="brand">AgriNet AI</div>
+            <div class="tagline">Smart farming network</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="bell-btn"><i class="fa-solid fa-bell"></i></button>
+          <div class="avatar">RP</div>
+        </div>
+      </div>
+
+      <!-- Screen: Dashboard -->
+      <div class="screen-content active" id="sc-dashboard">
+        <div class="scroll-body">
+          <!-- KPIs -->
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-label">Demand Signal</div>
+              <div class="kpi-val" style="color:var(--green)">Tomato ↑</div>
+              <div class="kpi-badge badge-green">+34% · 30d</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Farmers</div>
+              <div class="kpi-val" id="m-counter">2,847</div>
+              <div class="kpi-badge badge-blue">+12 today</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Avg Profit</div>
+              <div class="kpi-val" style="color:var(--green)">+62%</div>
+              <div class="kpi-badge badge-green">vs last season</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Spoilage Saved</div>
+              <div class="kpi-val">18.4T</div>
+              <div class="kpi-badge badge-warn">this month</div>
+            </div>
+          </div>
+
+          <!-- Demand Chart -->
+          <div class="mini-chart-box">
+            <div class="sec-header">
+              <div class="sec-title">Live Demand Forecast</div>
+              <div class="panel-label"><i class="fa-solid fa-chart-line"></i> 30d</div>
+            </div>
+            <div class="chart-bars" id="m-chart"></div>
+            <div class="chart-labels">
+              <div class="chart-label">Tomato</div>
+              <div class="chart-label">Onion</div>
+              <div class="chart-label">Potato</div>
+              <div class="chart-label">Wheat</div>
+              <div class="chart-label">Brinjal</div>
+              <div class="chart-label">Soybean</div>
+            </div>
+          </div>
+
+          <!-- AI Recommendation -->
+          <div class="ai-box">
+            <div class="ai-label"><i class="fa-solid fa-microchip"></i> AI Recommendation Today</div>
+            <div class="ai-crop">Tomato</div>
+            <div class="ai-profit">Est. Profit: ₹61,000/acre · Black soil match</div>
+            <div class="ai-conf"><i class="fa-solid fa-circle-check"></i> 92% Confidence</div>
+            <button class="ai-btn" onclick="mobileNav('crop')"><i class="fa-solid fa-flask"></i> Re-run AI Analysis</button>
+          </div>
+
+          <!-- Spoilage Alert -->
+          <div class="sec-header"><div class="sec-title">Active Alerts</div></div>
+          <div class="alert-card danger">
+            <div class="alert-icon">⚠️</div>
+            <div>
+              <div class="alert-title">High Spoilage Risk — Brinjal</div>
+              <div class="alert-body">0.9T · 8h transit · 91% risk · Reroute to Pimpri-Chinchwad</div>
+            </div>
+          </div>
+          <div class="alert-card success">
+            <div class="alert-icon">✅</div>
+            <div>
+              <div class="alert-title">Pool Transport Saved ₹2,800</div>
+              <div class="alert-body">4 farmers pooled · Nashik to Pune APMC today</div>
+            </div>
+          </div>
+
+          <!-- Crop Scroll -->
+          <div class="sec-header">
+            <div class="sec-title">Mandi Prices Today</div>
+            <button class="sec-more">See all</button>
+          </div>
+          <div class="h-scroll">
+            <div class="crop-card active">
+              <div class="crop-icon">🍅</div>
+              <div class="crop-name">Tomato</div>
+              <div class="crop-price">₹22/kg</div>
+              <div class="crop-trend" style="color:var(--green)">↑ +12%</div>
+            </div>
+            <div class="crop-card">
+              <div class="crop-icon">🧅</div>
+              <div class="crop-name">Onion</div>
+              <div class="crop-price">₹18/kg</div>
+              <div class="crop-trend" style="color:var(--warn)">↗ +4%</div>
+            </div>
+            <div class="crop-card">
+              <div class="crop-icon">🥔</div>
+              <div class="crop-name">Potato</div>
+              <div class="crop-price">₹14/kg</div>
+              <div class="crop-trend" style="color:var(--sec)">→ Stable</div>
+            </div>
+            <div class="crop-card">
+              <div class="crop-icon">🌾</div>
+              <div class="crop-name">Wheat</div>
+              <div class="crop-price">₹22/kg</div>
+              <div class="crop-trend" style="color:var(--sec)">→ Stable</div>
+            </div>
+            <div class="crop-card">
+              <div class="crop-icon">🍆</div>
+              <div class="crop-name">Brinjal</div>
+              <div class="crop-price">₹16/kg</div>
+              <div class="crop-trend" style="color:var(--green)">↑ +8%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen: Crop AI -->
+      <div class="screen-content" id="sc-crop">
+        <div class="scroll-body">
+          <div style="text-align:center;padding:4px 0 8px">
+            <div class="sec-title" style="font-size:16px">🤖 AI Crop Recommendation</div>
+            <div style="font-size:12px;color:var(--sec);margin-top:3px">Random Forest · sklearn</div>
+          </div>
+          <div class="form-box">
+            <div class="f-label">Soil Type</div>
+            <select class="f-select" id="m-soil">
+              <option value="">Select soil…</option>
+              <option value="black">Black cotton</option>
+              <option value="red">Red laterite</option>
+              <option value="alluvial">Alluvial</option>
+              <option value="sandy">Sandy</option>
+              <option value="clay">Clay</option>
+            </select>
+            <div class="f-label">Water Availability</div>
+            <select class="f-select" id="m-water">
+              <option value="">Select water level…</option>
+              <option value="low">Low (rainfed)</option>
+              <option value="medium">Medium (borewell)</option>
+              <option value="high">High (canal)</option>
+            </select>
+            <div class="f-label">Land Size</div>
+            <select class="f-select" id="m-land">
+              <option value="">Select area…</option>
+              <option value="small">1–2 acres</option>
+              <option value="medium">2–5 acres</option>
+              <option value="large">5+ acres</option>
+            </select>
+            <div class="f-label">Season</div>
+            <select class="f-select" id="m-season">
+              <option value="kharif">Kharif (June–Oct)</option>
+              <option value="rabi">Rabi (Nov–Mar)</option>
+              <option value="zaid">Zaid (Mar–Jun)</option>
+            </select>
+            <button class="run-btn" id="m-run-btn" onclick="mobileRunAI()">
+              <i class="fa-solid fa-microchip"></i> Run AI Analysis
+            </button>
+          </div>
+          <div id="m-results" class="result-list" style="display:none"></div>
+          <div id="m-ai-note" style="display:none;font-size:11px;color:var(--sec);background:var(--green-light);border-radius:10px;padding:10px 12px;border:1px solid rgba(26,141,104,0.15);line-height:1.5"></div>
+        </div>
+      </div>
+
+      <!-- Screen: Voice -->
+      <div class="screen-content" id="sc-voice">
+        <div class="scroll-body">
+          <div class="voice-widget">
+            <div class="mic-ring" id="m-mic" onclick="mobileToggleMic()">🎤</div>
+            <div class="voice-title">Voice AI Interface</div>
+            <div class="voice-sub">Tap mic and speak in Hindi, Marathi or English</div>
+            <div class="voice-bubble" id="m-voice-bubble">
+              <b style="font-size:10px;opacity:0.7">FARMER:</b><br>
+              "Kal kya bechna chahiye?"
+            </div>
+            <div class="voice-bubble" style="margin-top:8px;background:rgba(255,255,255,0.05)">
+              <b style="font-size:10px;opacity:0.7">AGRINET AI:</b><br>
+              "Kal tamatar becho — Pune mandi mein demand zyada hai. Bhav ₹22–₹25/kg milega!"
+            </div>
+          </div>
+          <div style="margin-top:4px">
+            <div class="sec-title" style="margin-bottom:10px">Quick Questions</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div onclick="mobileQuickQ('What crop should I plant?')" style="background:var(--card);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
+                <span style="color:var(--green)">💬</span> What crop should I plant?
+              </div>
+              <div onclick="mobileQuickQ('What is the mandi price today?')" style="background:var(--card);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
+                <span style="color:var(--warn)">💬</span> Mandi price kya hai aaj?
+              </div>
+              <div onclick="mobileQuickQ('Transport pooling cost?')" style="background:var(--card);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
+                <span style="color:var(--info)">💬</span> Transport ka kharcha kitna?
+              </div>
+            </div>
+          </div>
+          <div id="m-voice-answer" style="display:none;background:var(--card);border-radius:12px;padding:12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);border-left:3px solid var(--green)">
+            <div style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:6px">AI Response</div>
+            <div id="m-voice-text" style="font-size:13px;color:var(--text);line-height:1.5"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen: Blockchain -->
+      <div class="screen-content" id="sc-blockchain">
+        <div class="scroll-body">
+          <div class="sec-title">Supply Chain Trace</div>
+          <div style="font-size:11px;color:var(--sec);margin-bottom:12px">Shipment #TN-2024-8821 · Tomato · Nashik → Pune</div>
+          <div class="alert-card success" style="margin-bottom:12px">
+            <div class="alert-icon">🔗</div>
+            <div>
+              <div class="alert-title">All 4 checkpoints verified</div>
+              <div class="alert-body">Immutable blockchain records — no tampering detected</div>
+            </div>
+          </div>
+          <!-- Timeline -->
+          <div style="display:flex;flex-direction:column;gap:0;position:relative;padding-left:28px">
+            <div style="position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--green);border-radius:2px"></div>
+            <div id="bc-steps"></div>
+          </div>
+          <div class="alert-card danger" style="margin-top:12px">
+            <div class="alert-icon">🚨</div>
+            <div>
+              <div class="alert-title">Fraud Flagged — #ON-8810</div>
+              <div class="alert-body">Weight mismatch: Declared 1.8T · Arrived 1.4T</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <button class="nav-item active" id="mnav-dashboard" onclick="mobileNav('dashboard')">
+          <i class="fa-solid fa-gauge"></i>Home
+        </button>
+        <button class="nav-item" id="mnav-crop" onclick="mobileNav('crop')">
+          <i class="fa-solid fa-seedling"></i>Crop AI
+        </button>
+        <button class="nav-item" id="mnav-voice" onclick="mobileNav('voice')">
+          <i class="fa-solid fa-microphone"></i>Voice AI
+        </button>
+        <button class="nav-item" id="mnav-blockchain" onclick="mobileNav('blockchain')">
+          <i class="fa-solid fa-link"></i>Chain
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Navigation =====
+function mobileNav(tab) {
+  document.querySelectorAll('.screen-content').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sc-' + tab).classList.add('active');
+  document.getElementById('mnav-' + tab).classList.add('active');
+}
+
+// ===== Chart =====
+function buildChart() {
+  const data = [87, 54, 43, 18, 31, 38];
+  const max = Math.max(...data);
+  const container = document.getElementById('m-chart');
+  container.innerHTML = data.map((v, i) => {
+    const h = Math.round((v / max) * 100);
+    return `<div class="chart-bar ${i === 0 ? 'active' : ''}" style="height:${h}%" data-h="${h}"></div>`;
+  }).join('');
+  // Animate
+  setTimeout(() => {
+    document.querySelectorAll('.chart-bar').forEach(b => {
+      b.style.height = b.getAttribute('data-h') + '%';
+    });
+  }, 100);
+}
+
+// ===== Blockchain Steps =====
+const BC_STEPS = [
+  {icon: '🌾', title: 'Farm recorded', sub: 'Raju Patil · Nashik · 2024-11-01 06:12', hash: '0xa3f9…c142'},
+  {icon: '⚖️', title: 'Weighed & graded', sub: '2.4T · Grade A · 08:30', hash: '0xb72d…f381'},
+  {icon: '🚛', title: 'Transport dispatched', sub: 'Truck MH-15-AB-4421 · 09:00', hash: '0xc91e…2a07'},
+  {icon: '🏪', title: 'Arrived at mandi', sub: 'Pune APMC · ₹22/kg · 14:45', hash: '0xd44a…9b53'},
+];
+function buildBCSteps() {
+  const cont = document.getElementById('bc-steps');
+  cont.innerHTML = BC_STEPS.map(s => `
+    <div style="position:relative;margin-bottom:18px">
+      <div style="position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid white;z-index:1"></div>
+      <div style="background:var(--card);border-radius:10px;padding:10px 12px;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
+        <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px">
+          ${s.icon} ${s.title}
+          <span style="font-size:10px;background:rgba(26,141,104,0.08);color:var(--green);padding:2px 6px;border-radius:4px;font-weight:600;margin-left:auto">✓ Verified</span>
+        </div>
+        <div style="font-size:11px;color:var(--sec);margin-top:3px">${s.sub}</div>
+        <code style="font-size:10px;color:var(--green);background:var(--green-light);padding:2px 6px;border-radius:3px;margin-top:4px;display:inline-block">${s.hash}</code>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== Crop AI =====
+const ML_FALLBACK = {
+  black_medium: [{crop:'Tomato',score:9.2,profit:'₹61,000',confidence:92},{crop:'Soybean',score:7.8,profit:'₹45,000',confidence:68},{crop:'Onion',score:6.5,profit:'₹41,000',confidence:54}],
+  red_high: [{crop:'Brinjal',score:8.8,profit:'₹48,000',confidence:88},{crop:'Potato',score:7.1,profit:'₹52,000',confidence:65},{crop:'Onion',score:5.8,profit:'₹41,000',confidence:45}],
+  alluvial_high: [{crop:'Potato',score:9.1,profit:'₹52,000',confidence:91},{crop:'Wheat',score:7.8,profit:'₹35,000',confidence:73},{crop:'Tomato',score:7.2,profit:'₹61,000',confidence:66}],
+};
+
+async function mobileRunAI() {
+  const soil = document.getElementById('m-soil').value;
+  const water = document.getElementById('m-water').value;
+  const land  = document.getElementById('m-land').value;
+  const season = document.getElementById('m-season').value;
+
+  if (!soil || !water || !land) {
+    document.getElementById('m-run-btn').style.background = '#C14646';
+    setTimeout(() => document.getElementById('m-run-btn').style.background = '', 600);
+    return;
+  }
+
+  const btn = document.getElementById('m-run-btn');
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Running AI…';
+  btn.disabled = true;
+
+  await new Promise(r => setTimeout(r, 1600));
+
+  // Try FastAPI direct, then fallback
+  let results = null;
+  let note = '';
+  try {
+    const resp = await fetch('http://localhost:8000/api/ml/crop-recommend', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({soil, water, land, season, region: 'Nashik'})
+    });
+    const data = await resp.json();
+    results = data.results;
+    note = data.supply_balance_note || '';
+  } catch {
+    // Fallback
+    const key = `${soil}_${water}`;
+    results = ML_FALLBACK[key] || ML_FALLBACK['black_medium'];
+    note = `AI Supply Balancer: ${results[0].crop} demand is currently underserved. Recommended crop aligns with regional market gaps.`;
+  }
+
+  const listEl = document.getElementById('m-results');
+  listEl.style.display = 'flex';
+  listEl.innerHTML = results.map((r, i) => `
+    <div class="result-item ${i===0?'top':''}">
+      <div class="result-rank">${i===0?'#1':`#${i+1}`}</div>
+      <div style="flex:1">
+        <div class="result-crop-name">${r.crop}</div>
+        <div class="result-profit">${r.profit || '—'} /acre</div>
+        <div class="conf-bar" style="margin-top:6px"><div class="conf-fill" style="width:${r.confidence||r.score*10}%"></div></div>
+      </div>
+      <div class="result-score">${(r.score||0).toFixed(1)}</div>
+    </div>
+  `).join('');
+
+  if (note) {
+    const noteEl = document.getElementById('m-ai-note');
+    noteEl.textContent = '🤖 ' + note;
+    noteEl.style.display = 'block';
+  }
+
+  btn.innerHTML = '<i class="fa-solid fa-microchip"></i> Run AI Analysis';
+  btn.disabled = false;
+}
+
+// ===== Voice =====
+const VOICE_ANSWERS = [
+  "Kal tamatar becho — Pune mandi mein demand zyada hai. Bhav ₹22–25/kg milega. Pyaaz 5 din baad behtar rahega.",
+  "Aapke khet mein kali mitti hai aur paani madhyam hai. AI kehta hai Tamatar sabse behtar hai — ₹61,000/acre kama sakte hain.",
+  "Pool mein 3 aur kisaan hain aapke gaon se. Milke truck loge to sirf ₹950 lagega, akele ₹3,800 lagta.",
+  "Nashik junction par cold storage mein jagah hai. ₹80/din 2 ton tak.",
+  "Mausam chetawni: 3 din mein halki baarish. Pyaaz pehle kaat lein.",
+];
+let micActive = false;
+
+function mobileToggleMic() {
+  const mic = document.getElementById('m-mic');
+  micActive = !micActive;
+  if (micActive) {
+    mic.style.background = 'rgba(193,70,70,0.3)';
+    mic.textContent = '🔴';
+    setTimeout(() => {
+      micActive = false;
+      mic.style.background = '';
+      mic.textContent = '🎤';
+      showVoiceAnswer(VOICE_ANSWERS[Math.floor(Math.random() * VOICE_ANSWERS.length)]);
+    }, 2500);
+  }
+}
+
+function mobileQuickQ(q) {
+  showVoiceAnswer(VOICE_ANSWERS[Math.floor(Math.random() * VOICE_ANSWERS.length)]);
+}
+
+function showVoiceAnswer(text) {
+  const el = document.getElementById('m-voice-answer');
+  document.getElementById('m-voice-text').textContent = text;
+  el.style.display = 'block';
+  el.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+
+// ===== Init =====
+buildChart();
+buildBCSteps();
+</script>
+</body>
+</html>

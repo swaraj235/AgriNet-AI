@@ -1,0 +1,8 @@
+venv/
+ml_venv/
+__pycache__/
+*.pyc
+*.pyo
+agrinet.db
+.env
+.DS_Store
