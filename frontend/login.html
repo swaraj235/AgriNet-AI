@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AgriNet AI — Smart farming intelligence for Indian farmers. Crop AI, market prices, weather, and more.">
+  <title>AgriNet AI — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      background: #040D07;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* ── Left Panel ── */
+    .hero-panel {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0D5C35 0%, #065F46 40%, #0F172A 100%);
+    }
+    .hero-bg-art {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(74,222,128,.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16,185,129,.08) 0%, transparent 40%),
+        radial-gradient(circle at 60% 60%, rgba(6,95,70,.15) 0%, transparent 60%);
+    }
+    .hero-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .hero-content { position: relative; z-index: 2; }
+    .hero-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    .hero-logo-icon {
+      width: 48px; height: 48px;
+      background: rgba(74,222,128,.15);
+      border: 1px solid rgba(74,222,128,.3);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .hero-logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .hero-logo-sub { font-size: 12px; color: rgba(255,255,255,.5); margin-top: -2px; }
+    .hero-tagline {
+      font-family: 'Outfit', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .hero-tagline span {
+      background: linear-gradient(135deg, #4ADE80, #34D399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      font-size: 15px;
+      color: rgba(255,255,255,.65);
+      max-width: 380px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+    }
+    .hero-stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #4ADE80;
+      line-height: 1;
+    }
+    .hero-stat-label { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 3px; }
+
+    /* Floating cards */
+    .hero-float-cards {
+      position: absolute;
+      right: -20px;
+      bottom: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2;
+    }
+    .float-card {
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: floatAnim 3s ease-in-out infinite;
+    }
+    .float-card:nth-child(2) { animation-delay: 1s; }
+    .float-card:nth-child(3) { animation-delay: 2s; }
+    @keyframes floatAnim { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    .float-icon { font-size: 20px; }
+    .float-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.9); }
+    .float-sub   { font-size: 11px; color: rgba(255,255,255,.5); }
+
+    /* ── Right Panel (Login Form) ── */
+    .auth-panel {
+      width: 440px;
+      background: #080F0B;
+      border-left: 1px solid rgba(255,255,255,.06);
+      display: flex;
+      align-items: center;
+      padding: 40px;
+      position: relative;
+      overflow-y: auto;
+    }
+    .auth-panel-inner { width: 100%; }
+    .auth-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .auth-subtitle { font-size: 13.5px; color: rgba(255,255,255,.5); margin-bottom: 28px; }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      background: rgba(255,255,255,.05);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,.5);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .auth-tab.active {
+      background: rgba(255,255,255,.1);
+      color: #fff;
+    }
+
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      border-color: #4ADE80;
+      background: rgba(74,222,128,.06);
+      box-shadow: 0 0 0 3px rgba(74,222,128,.1);
+    }
+    .form-input::placeholder { color: rgba(255,255,255,.25); }
+    .form-input-icon-wrap { position: relative; }
+    .form-input-icon-wrap .form-input { padding-left: 40px; }
+    .form-input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.3);
+      font-size: 14px;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.3);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .password-toggle:hover { color: rgba(255,255,255,.7); }
+
+    /* Language select */
+    .lang-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .lang-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      border: 1.5px solid transparent;
+      color: rgba(255,255,255,.6);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .lang-btn.active { border-color: #4ADE80; color: #4ADE80; background: rgba(74,222,128,.08); }
+    .lang-btn:hover:not(.active) { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.8); }
+
+    /* Submit btn */
+    .auth-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #16A34A, #0D9488);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(22,163,74,.35);
+      margin-top: 20px;
+    }
+    .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(22,163,74,.5); }
+    .auth-btn:active { transform: translateY(0); }
+    .auth-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+    /* Error */
+    .auth-error {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(220,38,38,.1);
+      border: 1px solid rgba(220,38,38,.25);
+      border-radius: 8px;
+      color: #FCA5A5;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+    .auth-error.show { display: flex; }
+
+    .auth-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,.35);
+    }
+
+    @media (max-width: 900px) {
+      .hero-panel { display: none; }
+      .auth-panel { width: 100%; border-left: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Panel -->
+  <div class="hero-panel">
+    <div class="hero-bg"></div>
+    <div class="hero-bg-art"></div>
+    <div class="hero-dots"></div>
+    <div class="hero-content">
+      <div class="hero-logo">
+        <div class="hero-logo-icon">🌱</div>
+        <div>
+          <div class="hero-logo-text">AgriNet AI</div>
+          <div class="hero-logo-sub">Smart Farming Intelligence</div>
+        </div>
+      </div>
+      <div class="hero-tagline">
+        Farm smarter.<br>Earn <span>more.</span>
+      </div>
+      <div class="hero-desc">
+        Real-time crop AI, live mandi prices, weather intelligence, and transport pooling — all in one platform built for Indian farmers.
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-val">2,847</div>
+          <div class="hero-stat-label">Farmers using AgriNet</div>
+        </div>
+        <div>
+          <div class="hero-stat-val">+62%</div>
+          <div class="hero-stat-label">Avg profit increase</div>
+        </div>
+        <div>
+          <div class="hero-stat-val">18T</div>
+          <div class="hero-stat-label">Spoilage prevented</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating cards -->
+    <div class="hero-float-cards">
+      <div class="float-card">
+        <div class="float-icon">🍅</div>
+        <div>
+          <div class="float-title">Tomato: ₹24/kg ↑12%</div>
+          <div class="float-sub">Pune APMC · Live price</div>
+        </div>
+      </div>
+      <div class="float-card">
+        <div class="float-icon">🌡️</div>
+        <div>
+          <div class="float-title">32°C · 68% humidity</div>
+          <div class="float-sub">Nashik · OpenWeatherMap</div>
+        </div>
+      </div>
+      <div class="float-card">
+        <div class="float-icon">🤖</div>
+        <div>
+          <div class="float-title">Plant Tomato this season</div>
+          <div class="float-sub">AI confidence: 94%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Panel -->
+  <div class="auth-panel">
+    <div class="auth-panel-inner">
+      <div class="auth-title" id="auth-title">Welcome back</div>
+      <div class="auth-subtitle" id="auth-subtitle">Sign in to your AgriNet account</div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</div>
+      </div>
+
+      <!-- Language selector -->
+      <div class="lang-row">
+        <button class="lang-btn active" id="lang-en" onclick="setLang('en')">🇬🇧 English</button>
+        <button class="lang-btn" id="lang-hi" onclick="setLang('hi')">🇮🇳 हिंदी</button>
+        <button class="lang-btn" id="lang-mr" onclick="setLang('mr')">🇮🇳 मराठी</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <div class="form-input-icon-wrap">
+            <i class="fa-solid fa-envelope form-input-icon"></i>
+            <input type="email" class="form-input" id="login-email" placeholder="farmer@example.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="form-input-icon-wrap" style="position:relative;">
+            <i class="fa-solid fa-lock form-input-icon"></i>
+            <input type="password" class="form-input" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+            <span class="password-toggle" onclick="togglePwd('login-password', this)"><i class="fa-solid fa-eye"></i></span>
+          </div>
+        </div>
+        <div class="auth-error" id="login-error">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="login-error-msg"></span>
+        </div>
+        <button type="submit" class="auth-btn" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <!-- Signup Form (hidden) -->
+      <form id="signup-form" style="display:none;" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <div class="form-input-icon-wrap">
+            <i class="fa-solid fa-user form-input-icon"></i>
+            <input type="text" class="form-input" id="signup-name" placeholder="Raju Patil" required autocomplete="name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <div class="form-input-icon-wrap">
+            <i class="fa-solid fa-envelope form-input-icon"></i>
+            <input type="email" class="form-input" id="signup-email" placeholder="farmer@example.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone (optional)</label>
+          <div class="form-input-icon-wrap">
+            <i class="fa-solid fa-phone form-input-icon"></i>
+            <input type="tel" class="form-input" id="signup-phone" placeholder="+91 98765 43210" autocomplete="tel">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="form-input-icon-wrap" style="position:relative;">
+            <i class="fa-solid fa-lock form-input-icon"></i>
+            <input type="password" class="form-input" id="signup-password" placeholder="At least 6 characters" required autocomplete="new-password">
+            <span class="password-toggle" onclick="togglePwd('signup-password', this)"><i class="fa-solid fa-eye"></i></span>
+          </div>
+        </div>
+        <div class="auth-error" id="signup-error">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="signup-error-msg"></span>
+        </div>
+        <button type="submit" class="auth-btn" id="signup-btn">
+          <i class="fa-solid fa-user-plus"></i> Create Account
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        By continuing, you agree to our terms of service.<br>
+        Built for Indian farmers 🇮🇳 · AgriNet AI v2.0
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    let currentLang = localStorage.getItem('agrinet-lang') || 'en';
+
+    // Redirect if already logged in
+    if (localStorage.getItem('agrinet_token')) {
+      window.location.href = '/app';
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+      const titles = {
+        en:  {login: ['Welcome back', 'Sign in to your AgriNet account'], signup: ['Create account', 'Join 2,847 farmers on AgriNet']},
+        hi:  {login: ['वापस स्वागत है', 'अपने एग्रीनेट खाते में साइन इन करें'], signup: ['खाता बनाएं', 'AgriNet पर 2,847 किसानों से जुड़ें']},
+        mr:  {login: ['परत आपले स्वागत', 'AgriNet खात्यात साइन इन करा'], signup: ['खाते तयार करा', 'AgriNet वर 2,847 शेतकऱ्यांमध्ये सामील व्हा']},
+      };
+      const t = titles[currentLang] || titles.en;
+      document.getElementById('auth-title').textContent = t[tab][0];
+      document.getElementById('auth-subtitle').textContent = t[tab][1];
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('agrinet-lang', lang);
+      ['en','hi','mr'].forEach(l => document.getElementById('lang-'+l).classList.toggle('active', l === lang));
+      // Re-apply current tab title
+      const activeTab = document.getElementById('tab-login').classList.contains('active') ? 'login' : 'signup';
+      switchTab(activeTab);
+    }
+
+    function togglePwd(id, btn) {
+      const inp = document.getElementById(id);
+      const isText = inp.type === 'text';
+      inp.type = isText ? 'password' : 'text';
+      btn.innerHTML = `<i class="fa-solid fa-eye${isText ? '' : '-slash'}"></i>`;
+    }
+
+    function showError(formId, msg) {
+      const el = document.getElementById(formId + '-error');
+      document.getElementById(formId + '-error-msg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in…';
+      try {
+        const r = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-password').value,
+          })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.detail || data.error || 'Login failed');
+        localStorage.setItem('agrinet_token', data.token);
+        localStorage.setItem('agrinet_user', JSON.stringify(data.user));
+        localStorage.setItem('agrinet-lang', data.user?.language || currentLang);
+        window.location.href = '/app';
+      } catch (err) {
+        showError('login', err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+      }
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      const btn = document.getElementById('signup-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account…';
+      try {
+        const r = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            name: document.getElementById('signup-name').value,
+            email: document.getElementById('signup-email').value,
+            phone: document.getElementById('signup-phone').value || '',
+            password: document.getElementById('signup-password').value,
+            language: currentLang,
+          })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.detail || data.error || 'Signup failed');
+        localStorage.setItem('agrinet_token', data.token);
+        localStorage.setItem('agrinet_user', JSON.stringify(data.user));
+        localStorage.setItem('agrinet-lang', currentLang);
+        window.location.href = '/app';
+      } catch (err) {
+        showError('signup', err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+      }
+    }
+
+    // Apply saved language
+    setLang(currentLang);
+  </script>
+</body>
+</html>

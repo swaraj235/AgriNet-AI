@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AgriNet AI — Smart crop AI, live mandi prices, weather, and transport pooling.">
+  <title>AgriNet AI — Farm Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Leaflet for real maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <!-- Auth guard -->
+  <script>
+    (function() {
+      if (!localStorage.getItem('agrinet_token')) {
+        window.location.href = '/login';
+      }
+    })();
+  </script>
+</head>
+<body data-theme="light">
+
+<div class="app-layout">
+  <!-- ====================================================================
+       SIDEBAR
+  ===================================================================== -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2C8 2 4 5.5 4 10c0 3 1.5 5.5 4 7.2V21h8v-3.8C18.5 15.5 20 13 20 10c0-4.5-4-8-8-8z"/>
+        <path d="M12 6v7M9 9l3-3 3 3"/>
+      </svg>
+      <div>
+        <div class="sidebar-brand">AgriNet AI</div>
+        <div class="sidebar-tagline">v2.0 · Smart Farming</div>
+      </div>
+    </div>
+
+    <!-- Live Location + Weather Widget -->
+    <div class="sidebar-context" id="sidebar-context">
+      <div class="sidebar-location">
+        <i class="fa-solid fa-location-dot loc-icon"></i>
+        <span class="loc-name" id="loc-name">Detecting location…</span>
+        <span style="font-size:10px;color:rgba(255,255,255,.35);cursor:pointer;" onclick="refreshLocation()" title="Refresh location">↻</span>
+      </div>
+      <div class="sidebar-weather">
+        <div class="weather-icon" id="weather-icon">⏳</div>
+        <div>
+          <div class="weather-temp" id="weather-temp">--°C</div>
+          <div class="weather-desc" id="weather-desc">Loading…</div>
+          <div class="weather-hum" id="weather-hum">--% humidity</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <div class="nav-item active" data-tab="dashboard" onclick="navTo('dashboard', this)">
+        <i class="nav-icon fa-solid fa-gauge-high"></i>
+        <span data-i18n="nav_dashboard">Dashboard</span>
+      </div>
+      <div class="nav-item" data-tab="crop" onclick="navTo('crop', this)">
+        <i class="nav-icon fa-solid fa-seedling"></i>
+        <span data-i18n="nav_crop">Crop AI</span>
+      </div>
+      <div class="nav-item" data-tab="market" onclick="navTo('market', this)">
+        <i class="nav-icon fa-solid fa-chart-line"></i>
+        <span data-i18n="nav_market">Market Prices</span>
+        <span class="nav-badge green">LIVE</span>
+      </div>
+      <div class="nav-item" data-tab="weather" onclick="navTo('weather', this)">
+        <i class="nav-icon fa-solid fa-cloud-sun"></i>
+        <span>Weather AI</span>
+      </div>
+
+      <div class="nav-section-label" style="margin-top:4px;">Tools</div>
+      <div class="nav-item" data-tab="transport" onclick="navTo('transport', this)">
+        <i class="nav-icon fa-solid fa-truck-ramp-box"></i>
+        <span data-i18n="nav_transport">Transport Pool</span>
+      </div>
+      <div class="nav-item" data-tab="spoilage" onclick="navTo('spoilage', this)">
+        <i class="nav-icon fa-solid fa-temperature-half"></i>
+        <span data-i18n="nav_spoilage">Spoilage AI</span>
+      </div>
+      <div class="nav-item" data-tab="supply" onclick="navTo('supply', this)">
+        <i class="nav-icon fa-solid fa-scale-balanced"></i>
+        <span>Supply Balancer</span>
+      </div>
+      <div class="nav-item" data-tab="blockchain" onclick="navTo('blockchain', this)">
+        <i class="nav-icon fa-solid fa-link"></i>
+        <span data-i18n="nav_blockchain">Blockchain</span>
+      </div>
+
+      <div class="nav-section-label" style="margin-top:4px;">AI</div>
+      <div class="nav-item" data-tab="chat" onclick="navTo('chat', this)">
+        <i class="nav-icon fa-solid fa-comments"></i>
+        <span data-i18n="nav_voice">AI Advisor</span>
+        <span class="nav-badge">AI</span>
+      </div>
+    </nav>
+
+    <!-- User profile + actions -->
+    <div class="sidebar-footer">
+      <div class="user-profile-mini dropdown" id="user-profile-mini" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="sidebar-avatar">U</div>
+        <div>
+          <div class="user-name-mini" id="sidebar-name">Farmer</div>
+          <div class="user-role-mini" id="sidebar-email">Loading…</div>
+        </div>
+        <i class="fa-solid fa-chevron-up" style="margin-left:auto;color:rgba(255,255,255,.3);font-size:11px;"></i>
+        <div class="dropdown-menu" id="user-dropdown">
+          <div class="dropdown-item"><i class="fa-solid fa-user"></i> Profile</div>
+          <div class="dropdown-sep"></div>
+          <div class="dropdown-item danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+        </div>
+      </div>
+      <div class="sidebar-footer-actions">
+        <button class="sidebar-icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+        <select class="sidebar-icon-btn" id="language-select" onchange="onLangChange(this.value)" style="font-size:12px;cursor:pointer;padding:0 10px;" title="Language">
+          <option value="en">🌐 EN</option>
+          <option value="hi">🇮🇳 HI</option>
+          <option value="mr">🇮🇳 MR</option>
+        </select>
+        <button class="sidebar-icon-btn" onclick="refreshLocation()" title="Refresh location">
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- ====================================================================
+       MAIN CONTENT
+  ===================================================================== -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">🍔</button>
+        <div>
+          <div class="page-title" id="page-title">Dashboard</div>
+          <div class="page-subtitle" id="page-subtitle">Welcome back, Farmer</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-sec);padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-full);">
+          <span class="status-dot" id="api-status-dot" style="background:var(--clr-warn);"></span>
+          <span id="api-status-text">Connecting…</span>
+        </div>
+        <button class="topbar-btn" title="Notifications"><i class="fa-solid fa-bell"></i></button>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-area">
+
+      <!-- ================================================================
+           DASHBOARD
+      ================================================================= -->
+      <section class="section active" id="s-dashboard">
+        <!-- KPI Row -->
+        <div class="grid-4">
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:rgba(22,163,74,.1);color:var(--clr-primary);">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <div class="kpi-label" data-i18n="demand_signal">Demand signal</div>
+            <div class="kpi-value green" id="kpi-demand">Tomato ↑</div>
+            <div class="kpi-change up" id="kpi-demand-change"><i class="fa-solid fa-arrow-up"></i> +34% next 30d</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:rgba(37,99,235,.1);color:var(--clr-info);">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="kpi-label" data-i18n="farmers_connected">Farmers connected</div>
+            <div class="kpi-value" id="counter-farmers">2,847</div>
+            <div class="kpi-change up"><i class="fa-solid fa-user-plus"></i> +12 today</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:rgba(22,163,74,.1);color:var(--clr-primary);">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+            <div class="kpi-label" data-i18n="profit_increase">Avg profit increase</div>
+            <div class="kpi-value" style="color:var(--clr-primary);">+62%</div>
+            <div class="kpi-change up"><i class="fa-solid fa-arrow-up"></i> vs last season</div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:rgba(245,158,11,.1);color:var(--clr-warn);">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="kpi-label" data-i18n="spoilage_prevented">Spoilage prevented</div>
+            <div class="kpi-value">18.4T</div>
+            <div class="kpi-change up"><i class="fa-solid fa-check"></i> this month</div>
+          </div>
+        </div>
+
+        <!-- Demand forecast + Supply map -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-chart-area"></i> <span data-i18n="forecast">Live demand forecast</span></div>
+              <button class="btn btn-ghost btn-sm" onclick="navTo('market', document.querySelector('[data-tab=market]'))">View all prices →</button>
+            </div>
+            <div id="dash-forecast-bars">
+              <div class="bar-row"><div class="bar-label">🍅 Tomato</div><div class="bar-track"><div class="bar-fill" data-width="87" style="width:0%;background:var(--clr-primary);"></div></div><div class="bar-val" style="color:var(--clr-primary);">+87%</div></div>
+              <div class="bar-row"><div class="bar-label">🧅 Onion</div><div class="bar-track"><div class="bar-fill" data-width="54" style="width:0%;background:var(--clr-accent);"></div></div><div class="bar-val" style="color:var(--clr-accent);">+54%</div></div>
+              <div class="bar-row"><div class="bar-label">🥔 Potato</div><div class="bar-track"><div class="bar-fill" data-width="43" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val">+43%</div></div>
+              <div class="bar-row"><div class="bar-label">🌶️ Chilli</div><div class="bar-track"><div class="bar-fill" data-width="62" style="width:0%;background:#DC2626;"></div></div><div class="bar-val" style="color:#DC2626;">+62%</div></div>
+              <div class="bar-row"><div class="bar-label">🌾 Wheat</div><div class="bar-track"><div class="bar-fill" data-width="18" style="width:0%;background:#9CA3AF;"></div></div><div class="bar-val">+18%</div></div>
+            </div>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:12px;" data-i18n="forecast_sub">Sources: Agmarknet · OpenWeatherMap · Festival signals</p>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-map-location-dot"></i> <span data-i18n="supply_map">Supply Balance Map</span></div>
+              <button class="btn btn-ghost btn-sm" onclick="navTo('supply', document.querySelector('[data-tab=supply]'))">Run Balancer →</button>
+            </div>
+            <div id="dash-map" style="height:220px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);"></div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="grid-3">
+          <div class="card" style="cursor:pointer;transition:var(--t);" onclick="navTo('crop', document.querySelector('[data-tab=crop]'))" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;background:linear-gradient(135deg,#16A34A,#0D9488);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0;">🌱</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Run Crop AI</div>
+                <div style="font-size:12px;color:var(--text-sec);">XGBoost · 32 crops · instant result</div>
+              </div>
+              <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--text-muted);"></i>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:var(--t);" onclick="navTo('chat', document.querySelector('[data-tab=chat]'))" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;background:linear-gradient(135deg,#7C3AED,#4F46E5);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0;">🤖</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Ask AI Advisor</div>
+                <div style="font-size:12px;color:var(--text-sec);">Hindi · Marathi · English</div>
+              </div>
+              <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--text-muted);"></i>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:var(--t);" onclick="navTo('market', document.querySelector('[data-tab=market]'))" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;background:linear-gradient(135deg,#D97706,#F59E0B);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0;">📊</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;margin-bottom:2px;">Live Mandi Prices</div>
+                <div style="font-size:12px;color:var(--text-sec);">Updated hourly · 14 crops</div>
+              </div>
+              <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--text-muted);"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           CROP AI
+      ================================================================= -->
+      <section class="section" id="s-crop">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-seedling"></i> <span data-i18n="crop_ai_title">Crop Recommendation AI</span></div>
+              <span class="badge badge-green">XGBoost · 4,200 samples</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-sec);margin-bottom:16px;">Enter your farm profile to get AI-ranked crop recommendations with profit estimates and market signals.</p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" data-i18n="soil_type">Soil Type</label>
+                <select class="form-control" id="crop-soil">
+                  <option value="">Select soil…</option>
+                  <option value="black">⬛ Black Cotton</option>
+                  <option value="red">🟥 Red Laterite</option>
+                  <option value="alluvial">🟫 Alluvial</option>
+                  <option value="sandy">🟡 Sandy</option>
+                  <option value="clay">🟤 Clay</option>
+                  <option value="loamy">🌿 Loamy</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="water_avail">Water Availability</label>
+                <select class="form-control" id="crop-water">
+                  <option value="">Select…</option>
+                  <option value="low">💧 Low (rainfed)</option>
+                  <option value="medium">💧💧 Medium (borewell)</option>
+                  <option value="high">💧💧💧 High (canal)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="land_acres">Land Size</label>
+                <select class="form-control" id="crop-land">
+                  <option value="">Select…</option>
+                  <option value="small">1–2 acres</option>
+                  <option value="medium">2–5 acres</option>
+                  <option value="large">5+ acres</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Season</label>
+                <select class="form-control" id="crop-season">
+                  <option value="kharif">🌧️ Kharif (Jun–Oct)</option>
+                  <option value="rabi">❄️ Rabi (Oct–Mar)</option>
+                  <option value="zaid">☀️ Zaid (Mar–Jun)</option>
+                </select>
+              </div>
+            </div>
+            <!-- Weather auto-fill notice -->
+            <div class="info-well" id="crop-weather-note" style="display:none;margin-bottom:16px;">
+              <i class="fa-solid fa-cloud-sun"></i>
+              <span id="crop-weather-note-text">AI will use your real-time weather data for better accuracy</span>
+            </div>
+            <button class="btn btn-run" id="crop-run-btn" onclick="runCropAI()">
+              <i class="fa-solid fa-microchip"></i> <span data-i18n="run_ai_btn">Run AI Recommendation</span>
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-trophy"></i> AI Results</div>
+              <div id="crop-model-badge" style="display:none;"><span class="badge badge-blue">XGBoost</span></div>
+            </div>
+            <div id="crop-result-area">
+              <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+                <i class="fa-solid fa-seedling" style="font-size:36px;margin-bottom:12px;opacity:0.3;"></i>
+                <div style="font-size:13px;">Fill in your farm profile and run the AI to see ranked crop recommendations</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           MARKET PRICES
+      ================================================================= -->
+      <section class="section" id="s-market">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <div class="card-title"><i class="icon fa-solid fa-satellite-dish"></i> <span data-i18n="mandi_prices">Live Mandi Prices</span></div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <select class="form-control" id="market-select" style="width:auto;font-size:12px;" onchange="loadMarket()">
+                <option>Pune APMC</option>
+                <option>Nashik APMC</option>
+                <option>Lasalgaon Mandi</option>
+                <option>Ahmednagar APMC</option>
+                <option>Mumbai APMC (Vashi)</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="loadMarket()"><i class="fa-solid fa-rotate"></i> <span data-i18n="refresh">Refresh</span></button>
+            </div>
+          </div>
+          <div id="market-updated" style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">Click Refresh to load live prices</div>
+          <div class="market-grid" id="market-grid">
+            <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);">
+              <i class="fa-solid fa-chart-bar" style="font-size:32px;margin-bottom:10px;opacity:0.3;"></i>
+              <div style="font-size:13px;">Click Refresh to load live mandi prices</div>
+            </div>
+          </div>
+        </div>
+        <!-- Price chart (hidden until a crop is clicked) -->
+        <div class="card" id="market-chart-card" style="display:none;">
+          <div class="card-header">
+            <div class="card-title"><i class="icon fa-solid fa-chart-line"></i> <span id="chart-crop-name">Tomato</span> — 30-Day Price Trend</div>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('market-chart-card').style.display='none'">✕ Close</button>
+          </div>
+          <canvas id="price-chart" height="100"></canvas>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           WEATHER AI
+      ================================================================= -->
+      <section class="section" id="s-weather">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-cloud-sun"></i> Current Weather</div>
+              <button class="btn btn-ghost btn-sm" onclick="loadWeather(true)"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            <div id="weather-main-card">
+              <div style="text-align:center;padding:30px;color:var(--text-muted);">
+                <i class="fa-solid fa-cloud-sun" style="font-size:40px;opacity:0.3;"></i>
+                <div style="margin-top:10px;font-size:13px;">Detecting your location…</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-wheat-awn"></i> Agri-Weather Advice</div>
+            </div>
+            <div id="weather-advice-list">
+              <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">Weather advice will appear here after detection</div>
+            </div>
+          </div>
+        </div>
+        <!-- Forecast -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;"><i class="icon fa-solid fa-calendar-days"></i> 3-Day Forecast</div>
+          <div id="weather-forecast-row" class="grid-3">
+            <div class="card" style="text-align:center;padding:20px;background:var(--bg);"><div style="font-size:32px;margin-bottom:8px;">⏳</div><div style="font-weight:600;">Loading…</div></div>
+            <div class="card" style="text-align:center;padding:20px;background:var(--bg);"><div style="font-size:32px;margin-bottom:8px;">⏳</div><div style="font-weight:600;">Loading…</div></div>
+            <div class="card" style="text-align:center;padding:20px;background:var(--bg);"><div style="font-size:32px;margin-bottom:8px;">⏳</div><div style="font-weight:600;">Loading…</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           TRANSPORT POOL
+      ================================================================= -->
+      <section class="section" id="s-transport">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-users-between-lines"></i> <span data-i18n="pool_title">Farmers in Your Area</span></div>
+              <span class="badge badge-blue" id="selected-count-badge">0 selected</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-sec);margin-bottom:14px;" data-i18n="pool_sub">Click farmers to add to transport pool — share costs and reduce per-trip expense.</p>
+            <div class="farmer-grid" id="farmer-grid">
+              <!-- Generated by JS -->
+            </div>
+            <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:12px;color:var(--text-sec);">Distance to mandi: <b id="pool-distance">25 km</b></div>
+              <div style="font-size:12px;color:var(--text-sec);">Avg weight: <b>2.5 tons</b></div>
+            </div>
+            <button class="btn btn-run" id="pool-calc-btn" onclick="calcPool()">
+              <i class="fa-solid fa-truck"></i> <span data-i18n="calc_pool_btn">Calculate Shared Transport</span>
+            </button>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-map-location-dot"></i> Pool Route Map</div>
+            </div>
+            <div id="transport-map" style="height:280px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);margin-bottom:16px;"></div>
+            <div id="pool-result" style="display:none;">
+              <!-- Results injected by JS -->
+            </div>
+            <div id="pool-placeholder" style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">
+              Select farmers and click Calculate to see cost savings
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SPOILAGE AI
+      ================================================================= -->
+      <section class="section" id="s-spoilage">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-temperature-three-quarters"></i> <span data-i18n="spoilage_title">Spoilage Risk Predictor</span></div>
+              <span class="badge badge-blue">GradientBoosting</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-sec);margin-bottom:16px;">Enter shipment details to predict spoilage risk and get AI recommendations.</p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Crop</label>
+                <select class="form-control" id="sp-crop">
+                  <option>Tomato</option><option>Onion</option><option>Potato</option>
+                  <option>Brinjal</option><option>Green Chilli</option><option>Garlic</option>
+                  <option>Wheat</option><option>Soybean</option><option>Maize</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Weight (tons)</label>
+                <input type="number" class="form-control" id="sp-weight" placeholder="2.4" min="0.1" max="50" step="0.1" value="2.4">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Transit Time (hours)</label>
+                <input type="number" class="form-control" id="sp-transit" placeholder="6" min="0.5" max="72" step="0.5" value="6">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Temperature (°C)</label>
+                <input type="number" class="form-control" id="sp-temp" placeholder="32" min="-5" max="55" id="sp-temp" value="32">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Humidity (%)</label>
+                <input type="number" class="form-control" id="sp-hum" placeholder="72" min="0" max="100" value="72">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Packaging</label>
+                <select class="form-control" id="sp-packaging">
+                  <option value="standard">📦 Standard</option>
+                  <option value="cold-chain">❄️ Cold Chain</option>
+                  <option value="vacuum">🔒 Vacuum Pack</option>
+                </select>
+              </div>
+            </div>
+            <!-- Weather auto-fill -->
+            <div class="info-well" id="sp-weather-fill" style="display:none;margin-bottom:14px;cursor:pointer;" onclick="applyWeatherToSpoilage()">
+              <i class="fa-solid fa-bolt"></i> <span>Click to auto-fill temperature & humidity from real-time weather</span>
+            </div>
+            <button class="btn btn-run" id="sp-run-btn" onclick="runSpoilage()">
+              <i class="fa-solid fa-shield-halved"></i> Predict Spoilage Risk
+            </button>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-triangle-exclamation"></i> Risk Analysis</div>
+            </div>
+            <div id="sp-result-area">
+              <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+                <i class="fa-solid fa-shield" style="font-size:36px;opacity:0.3;margin-bottom:12px;"></i>
+                <div style="font-size:13px;">Enter shipment details and run the predictor</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Realtime shipments -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-title" style="margin-bottom:16px;"><i class="icon fa-solid fa-truck-moving"></i> Active Shipments — Live Monitoring</div>
+          <div id="shipment-list">
+            <div class="spoilage-item"><div class="spoilage-crop-name">🍅 Tomato<div class="spoilage-meta">2.4T · 6h transit</div></div><div class="risk-bar"><div class="risk-fill risk-high" style="width:78%;"></div></div><div class="risk-pct" style="color:#F97316;">78%</div><span class="badge badge-red">Reroute</span></div>
+            <div class="spoilage-item"><div class="spoilage-crop-name">🧅 Onion<div class="spoilage-meta">1.8T · 4h transit</div></div><div class="risk-bar"><div class="risk-fill risk-medium" style="width:42%;"></div></div><div class="risk-pct" style="color:var(--clr-warn);">42%</div><span class="badge badge-amber">Monitor</span></div>
+            <div class="spoilage-item"><div class="spoilage-crop-name">🥔 Potato<div class="spoilage-meta">3.1T · 2h transit</div></div><div class="risk-bar"><div class="risk-fill risk-low" style="width:12%;"></div></div><div class="risk-pct" style="color:var(--clr-primary);">12%</div><span class="badge badge-green">OK</span></div>
+            <div class="spoilage-item"><div class="spoilage-crop-name">🍆 Brinjal<div class="spoilage-meta">0.9T · 8h transit</div></div><div class="risk-bar"><div class="risk-fill risk-critical" style="width:91%;"></div></div><div class="risk-pct" style="color:var(--clr-danger);">91%</div><span class="badge badge-red">Urgent</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SUPPLY BALANCER
+      ================================================================= -->
+      <section class="section" id="s-supply">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <div class="card-title"><i class="icon fa-solid fa-scale-balanced"></i> AI Supply Balancer — Core Innovation</div>
+            <div style="display:flex;gap:8px;">
+              <select class="form-control" id="supply-region" style="width:auto;font-size:12px;">
+                <option>Maharashtra</option>
+                <option>Gujarat</option>
+                <option>Karnataka</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="runSupplyBalancer()"><i class="fa-solid fa-rotate"></i> Run Balancer</button>
+            </div>
+          </div>
+          <p style="font-size:12.5px;color:var(--text-sec);margin-bottom:16px;">Distributes optimal crops across villages using affinity scoring + entropy optimization to prevent market saturation.</p>
+          <div id="supply-result">
+            <div style="text-align:center;padding:40px;color:var(--text-muted);">
+              <i class="fa-solid fa-scale-balanced" style="font-size:40px;opacity:0.3;margin-bottom:12px;"></i>
+              <div>Click "Run Balancer" to see AI-optimized crop distribution across villages</div>
+            </div>
+          </div>
+          <div id="supply-score-box" style="display:none;margin-top:14px;"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           BLOCKCHAIN
+      ================================================================= -->
+      <section class="section" id="s-blockchain">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-link"></i> <span data-i18n="bc_trace">Supply Chain Blockchain Trace</span></div>
+              <span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Verified</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-sec);margin-bottom:16px;" data-i18n="bc_shipment">Shipment #TN-2024-8821 · Tomato · Nashik → Pune</p>
+            <div class="timeline">
+              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Farm recorded <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Raju Patil · Nashik · 2024-11-01 06:12</p><code>Hash: 0xa3f9…c142</code></div></div>
+              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Weighed &amp; graded <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>2.4T · Grade A · 2024-11-01 08:30</p><code>Hash: 0xb72d…f381</code></div></div>
+              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Transport dispatched <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Truck MH-15-AB-4421 · 2024-11-01 09:00</p><code>Hash: 0xc91e…2a07</code></div></div>
+              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Arrived at mandi <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Pune APMC · ₹22/kg · 2024-11-01 14:45</p><code>Hash: 0xd44a…9b53</code></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="icon fa-solid fa-shield-halved"></i> <span data-i18n="bc_fraud">Fraud Prevention Alerts</span></div>
+            </div>
+            <div class="alert-box success" style="margin-bottom:16px;">
+              <div class="alert-icon" style="color:var(--clr-primary);"><i class="fa-solid fa-circle-check"></i></div>
+              <div><div class="alert-title">No anomalies detected</div><div class="alert-desc">Shipment #TN-2024-8821 is fully verified</div></div>
+            </div>
+            <p style="font-size:12.5px;font-weight:600;color:var(--text-sec);margin-bottom:10px;">Recent fraud flags (other shipments)</p>
+            <div class="step-card" style="border-color:rgba(220,38,38,.2);">
+              <div class="step-num" style="background:rgba(220,38,38,.08);color:var(--clr-danger);">!</div>
+              <div class="step-info"><h4>Weight mismatch — Shipment #ON-8810</h4><p>Declared 1.8T · Arrived 1.4T · Flagged & reported</p></div>
+            </div>
+            <div class="step-card" style="border-color:rgba(245,158,11,.2);">
+              <div class="step-num" style="background:rgba(245,158,11,.08);color:var(--clr-warn);">?</div>
+              <div class="step-info"><h4>Price below mandi rate — #PT-8794</h4><p>Sold ₹6/kg vs mandi avg ₹11/kg · Alert sent to farmer</p></div>
+            </div>
+            <div class="info-well" style="margin-top:14px;"><i class="fa-solid fa-lock"></i> Immutable records prevent middlemen from manipulating prices or weights</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           AI CHAT ADVISOR
+      ================================================================= -->
+      <section class="section" id="s-chat">
+        <div class="grid-2-1">
+          <div class="card" style="display:flex;flex-direction:column;padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#7C3AED,#4F46E5);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;">🤖</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;" data-i18n="ai_advisor">AI Farm Advisor</div>
+                <div style="font-size:11px;color:var(--text-sec);display:flex;align-items:center;gap:5px;">
+                  <span class="status-dot" id="chat-status-dot"></span>
+                  <span id="chat-status-text">Online · Context-aware</span>
+                </div>
+              </div>
+              <div style="margin-left:auto;display:flex;gap:6px;">
+                <button class="btn btn-ghost btn-sm" onclick="clearChat()">Clear</button>
+              </div>
+            </div>
+            <!-- Suggestion chips -->
+            <div class="chat-suggestions">
+              <button class="chat-suggestion-btn" onclick="fillChat('What crop should I plant this season?')">🌱 Best crop for me?</button>
+              <button class="chat-suggestion-btn" onclick="fillChat('What is today\\'s tomato price in Pune mandi?')">🍅 Tomato price</button>
+              <button class="chat-suggestion-btn" onclick="fillChat('How to prevent pest attack on my crops?')">🐛 Pest control</button>
+              <button class="chat-suggestion-btn" onclick="fillChat('Tell me about PM-KISAN scheme')">🏛️ Govt schemes</button>
+            </div>
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="chat-msg">
+                <div class="chat-avatar ai"><i class="fa-solid fa-robot"></i></div>
+                <div class="chat-bubble ai-bubble">
+                  👋 Namaste! I'm AgriNet AI, your personal farming advisor.<br><br>
+                  I can help with <b>crop selection, mandi prices, weather advice, pest control, government schemes,</b> and more.<br><br>
+                  Ask me anything in <b>Hindi, Marathi, or English</b> — I'll respond in your language!
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-bar">
+              <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about farming…" data-i18n-placeholder="chat_placeholder" onkeydown="if(event.key==='Enter')sendChat()">
+              <button class="chat-icon-btn mic" id="mic-btn" onclick="toggleMic()" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
+              <button class="chat-icon-btn" onclick="sendChat()" title="Send message"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
+
+          <!-- Right: context panel -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;"><i class="icon fa-solid fa-brain"></i> AI Context</div>
+              <p style="font-size:12px;color:var(--text-sec);margin-bottom:12px;">The AI uses this live data to give you relevant advice:</p>
+              <div id="chat-context-list" style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                  <i class="fa-solid fa-location-dot" style="color:var(--clr-primary);width:16px;"></i>
+                  <span id="ctx-location">Detecting location…</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                  <i class="fa-solid fa-cloud-sun" style="color:var(--clr-accent);width:16px;"></i>
+                  <span id="ctx-weather">Loading weather…</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                  <i class="fa-solid fa-chart-line" style="color:var(--clr-info);width:16px;"></i>
+                  <span id="ctx-prices">Prices not loaded</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;"><i class="icon fa-solid fa-gauge-high"></i> Impact</div>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border-radius:var(--r-md);">
+                  <div style="font-size:12px;color:var(--text-sec);">Before AgriNet</div>
+                  <div style="font-weight:800;font-size:18px;color:var(--clr-danger);font-family:'Outfit',sans-serif;">₹28K</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--clr-primary-xl);border-radius:var(--r-md);border:1px solid rgba(22,163,74,.2);">
+                  <div style="font-size:12px;color:var(--clr-primary-d);">With AgriNet</div>
+                  <div style="font-weight:800;font-size:18px;color:var(--clr-primary);font-family:'Outfit',sans-serif;">₹61K</div>
+                </div>
+                <div style="font-size:11px;text-align:center;color:var(--text-muted);">avg per acre/season</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/app.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/map.js"></script>
+</body>
+</html>
