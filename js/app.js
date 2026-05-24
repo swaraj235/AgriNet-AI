@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===== Navigation =====
   let aiModelsInited = false;
-  document.querySelectorAll('.navbtn').forEach(btn => {
+  // LEGACY: document.querySelectorAll('.navbtn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.getAttribute('data-tab');
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+      // LEGACY: document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
       document.getElementById('s-' + tab).classList.add('active');
       btn.classList.add('active');
       setTimeout(animateBars, 200);
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ===== Theme =====
-  const themeBtn = document.getElementById('theme-btn');
+  const themeBtn = // LEGACY: document.getElementById('theme-btn');
   const savedTheme = localStorage.getItem('agrinet-theme') || 'light';
   document.body.setAttribute('data-theme', savedTheme);
   themeBtn.innerHTML = savedTheme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';

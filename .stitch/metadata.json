@@ -1,0 +1,33 @@
+{
+  "projectId": "1408166385742814332",
+  "name": "projects/1408166385742814332",
+  "title": "AgriNet AI Dashboard",
+  "visibility": "PRIVATE",
+  "projectType": "PROJECT_DESIGN",
+  "origin": "STITCH",
+  "deviceType": "DESKTOP",
+  "designTheme": {
+    "colorMode": "LIGHT",
+    "font": "PLUS_JAKARTA_SANS",
+    "roundness": "ROUND_TWENTY",
+    "customColor": "#3D6B35",
+    "accentColor": "#D2F124",
+    "saturation": 4
+  },
+  "designSystem": {
+    "assetId": "5ebc084f94584d839e9a189ff3c78267",
+    "name": "Organic Tech Design System",
+    "uploadedScreenId": "9855086259368657228"
+  },
+  "screens": {},
+  "localFiles": {
+    "index": "index.html",
+    "login": "login.html",
+    "css": "css/styles.css",
+    "js_sidebar": "js/sidebar.js",
+    "js_app": "js/app.js",
+    "design_md": ".stitch/DESIGN.md"
+  },
+  "createTime": "2026-05-24T07:26:37Z",
+  "updateTime": "2026-05-24T08:30:00Z"
+}

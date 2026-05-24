@@ -7,13 +7,12 @@
   <title>AgriNet AI — Smart Farming Network</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-theme="light">
 
-  <!-- Auth guard — redirects to login if no token -->
   <script>
     (function() {
       const token = localStorage.getItem('agrinet_token');
@@ -21,596 +20,509 @@
     })();
   </script>
 
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <div class="app">
-    <!-- ============ TOP BAR ============ -->
-    <header class="topbar" id="topbar">
-      <div class="logo">
-        <svg viewBox="0 0 24 24"><path d="M17.5 12c0 1.9-.7 3.6-1.8 5H21v2H3v-2h5.3A8.5 8.5 0 014 12c0-4.4 3.6-8 8-8 1.6 0 3 .4 4.3 1.2L15 6.5a6 6 0 100 11l1.3 1.3c1.3-.9 2.2-2.4 2.2-4.1h-4V13h5a8 8 0 01-2 2.7"/></svg>
-      </div>
-      <div>
-        <div class="brand" data-i18n="app_title">AgriNet AI</div>
-        <div class="tagline" data-i18n="app_tagline">Smart crop &amp; supply network</div>
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🌾</div>
+        <div>
+          <div class="sidebar-brand">AgriNet AI</div>
+          <div class="sidebar-tagline">Smart Farming Network</div>
+        </div>
       </div>
 
-      <div class="nav-wrap">
-        <nav class="nav" id="main-nav">
-          <button class="navbtn active" data-tab="dashboard" data-i18n="nav_dashboard">Dashboard</button>
-          <button class="navbtn" data-tab="crop" data-i18n="nav_crop">Crop AI</button>
-          <button class="navbtn" data-tab="transport" data-i18n="nav_transport">Transport Pool</button>
-          <button class="navbtn" data-tab="spoilage" data-i18n="nav_spoilage">Spoilage AI</button>
-          <button class="navbtn" data-tab="blockchain" data-i18n="nav_blockchain">Blockchain</button>
-          <button class="navbtn" data-tab="aimodels">🤖 AI Models</button>
-          <button class="navbtn" data-tab="voice" data-i18n="nav_voice">Voice AI</button>
-          <button class="navbtn" data-tab="techstack">⚡ Tech Stack</button>
-        </nav>
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <button class="sidebar-nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </button>
+        <button class="sidebar-nav-item" data-tab="crop">
+          <i class="fa-solid fa-seedling"></i> Crop AI
+        </button>
+        <button class="sidebar-nav-item" data-tab="transport">
+          <i class="fa-solid fa-truck-ramp-box"></i> Transport Pool
+        </button>
+        <button class="sidebar-nav-item" data-tab="spoilage">
+          <i class="fa-solid fa-temperature-high"></i> Spoilage AI
+        </button>
+        <button class="sidebar-nav-item" data-tab="blockchain">
+          <i class="fa-solid fa-link"></i> Blockchain
+        </button>
+        <button class="sidebar-nav-item" data-tab="aimodels">
+          <i class="fa-solid fa-microchip"></i> AI Models
+        </button>
+        <button class="sidebar-nav-item" data-tab="voice">
+          <i class="fa-solid fa-microphone"></i> Voice AI
+        </button>
+        <button class="sidebar-nav-item" data-tab="techstack">
+          <i class="fa-solid fa-layer-group"></i> Tech Stack
+        </button>
+      </nav>
 
-        <div class="controls">
-          <select class="select-lang" id="language-select" aria-label="Select language">
-            <option value="en">🌐 English</option>
-            <option value="hi">🇮🇳 हिंदी</option>
-            <option value="mr">🇮🇳 मराठी</option>
-          </select>
-          <button class="theme-toggle" id="theme-btn" title="Toggle Theme" aria-label="Toggle dark mode">
-            <i class="fa-solid fa-moon"></i>
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-bottom">
+        <select class="sidebar-lang" id="language-select" aria-label="Select language" onchange="if(window.setLanguage) setLanguage(this.value)">
+          <option value="en">🌐 English</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="mr">🇮🇳 मराठी</option>
+        </select>
+        <button class="sidebar-theme-btn" id="theme-btn" onclick="toggleTheme()">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+          <span id="theme-label">Dark Mode</span>
+        </button>
+        <div class="sidebar-user" onclick="toggleUserMenu()">
+          <div class="sidebar-avatar" id="user-initials">U</div>
+          <div>
+            <div class="sidebar-user-name" id="dropdown-name">User</div>
+            <div class="sidebar-user-role" id="dropdown-email">user@email.com</div>
+          </div>
+          <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:rgba(255,255,255,0.4);font-size:11px;"></i>
+        </div>
+        <!-- Dropdown inside sidebar -->
+        <div class="user-dropdown" id="user-dropdown" style="position:relative;top:0;right:0;width:100%;margin-top:4px;">
+          <div class="user-dropdown-sep"></div>
+          <button class="user-dropdown-item" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logout">Logout</span>
           </button>
-          <!-- User Profile -->
-          <div class="user-menu" id="user-menu">
-            <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserMenu()">
-              <span id="user-initials">U</span>
-            </button>
-            <div class="user-dropdown" id="user-dropdown">
-              <div class="user-dropdown-header">
-                <div class="user-dropdown-name" id="dropdown-name">User</div>
-                <div class="user-dropdown-email" id="dropdown-email">user@email.com</div>
-              </div>
-              <div class="user-dropdown-sep"></div>
-              <button class="user-dropdown-item" onclick="logout()">
-                <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="logout">Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN PANEL ============ -->
+    <div class="main-panel">
+
+      <!-- Mini Top Bar -->
+      <header class="main-topbar">
+        <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="topbar-location">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>Nashik, Maharashtra</span>
+        </div>
+        <div class="topbar-weather">
+          <i class="fa-solid fa-cloud-sun" style="color:#C47F17;"></i>
+          <span id="topbar-time">—</span>
+        </div>
+        <div class="topbar-spacer"></div>
+        <button class="topbar-icon-btn" title="Notifications" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <button class="topbar-icon-btn theme-toggle" id="theme-btn2" title="Toggle Theme" onclick="toggleTheme()" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <div class="user-menu" id="user-menu-top">
+          <button class="topbar-user-btn" id="user-avatar-btn" onclick="toggleUserMenu()" aria-label="User menu">
+            <span id="user-initials-top">U</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ============ MAIN CONTENT ============ -->
+      <main class="content">
+
+        <!-- ===== SECTION: DASHBOARD ===== -->
+        <section class="section active" id="s-dashboard">
+
+          <!-- Hero Banner -->
+          <div class="hero-banner">
+            <div class="hero-topo"></div>
+            <div class="hero-leaf">🌿</div>
+            <div class="hero-leaf2">🌱</div>
+            <div class="hero-left">
+              <div class="hero-badge"><i class="fa-solid fa-robot"></i> AI-Powered Insights</div>
+              <h1 class="hero-title">Smart Farming<br>Made Simple</h1>
+              <p class="hero-sub">Conditions ideal for Tomato harvest in Nashik this week · Demand up 34% · Best price ₹22–₹25/kg</p>
+              <button class="hero-cta" onclick="switchTab('crop')">
+                <i class="fa-solid fa-seedling"></i> Ask Crop AI
               </button>
             </div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- ============ MAIN CONTENT ============ -->
-    <main class="content">
-
-      <!-- ===== SECTION: DASHBOARD ===== -->
-      <section class="section active" id="s-dashboard">
-        <div class="grid4">
-          <div class="card kpi-card">
-            <div class="kpi-icon" style="background:rgba(26,141,104,0.08);color:var(--color-primary);"><i class="fa-solid fa-arrow-trend-up"></i></div>
-            <h3 data-i18n="demand_signal">Demand signal — Pune</h3>
-            <div class="metric green">Tomato ↑</div>
-            <span class="badge up">+34% next 30d</span>
-          </div>
-          <div class="card kpi-card">
-            <div class="kpi-icon" style="background:rgba(59,130,246,0.08);color:var(--color-info);"><i class="fa-solid fa-users"></i></div>
-            <h3 data-i18n="farmers_connected">Farmers connected</h3>
-            <div class="metric" id="counter-farmers">2,847</div>
-            <span class="badge info"><i class="fa-solid fa-user-plus"></i> +12 today</span>
-          </div>
-          <div class="card kpi-card">
-            <div class="kpi-icon" style="background:rgba(26,141,104,0.08);color:var(--color-primary);"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-            <h3 data-i18n="profit_increase">Avg profit increase</h3>
-            <div class="metric green">+62%</div>
-            <span class="badge up">vs last season</span>
-          </div>
-          <div class="card kpi-card">
-            <div class="kpi-icon" style="background:rgba(245,158,11,0.08);color:var(--color-warn);"><i class="fa-solid fa-shield-halved"></i></div>
-            <h3 data-i18n="spoilage_prevented">Spoilage prevented</h3>
-            <div class="metric">18.4 T</div>
-            <span class="badge up">this month</span>
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div class="card">
-            <div class="section-title"><span data-i18n="forecast">Live demand forecast — next 30 days</span></div>
-            <div class="bar-row"><div class="bar-label">Tomato</div><div class="bar-track"><div class="bar-fill" data-width="87" style="width:0%;background:var(--color-primary);"></div></div><div class="bar-val" style="color:var(--color-primary);">+87%</div></div>
-            <div class="bar-row"><div class="bar-label">Onion</div><div class="bar-track"><div class="bar-fill" data-width="54" style="width:0%;background:var(--color-warn);"></div></div><div class="bar-val" style="color:var(--color-warn);">+54%</div></div>
-            <div class="bar-row"><div class="bar-label">Potato</div><div class="bar-track"><div class="bar-fill" data-width="43" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val" style="color:#6E7B8B;">+43%</div></div>
-            <div class="bar-row"><div class="bar-label">Wheat</div><div class="bar-track"><div class="bar-fill" data-width="18" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val" style="color:#6E7B8B;">+18%</div></div>
-            <div class="bar-row"><div class="bar-label">Brinjal</div><div class="bar-track"><div class="bar-fill" data-width="31" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val" style="color:#6E7B8B;">+31%</div></div>
-            <p class="footnote" data-i18n="forecast_sub">Sources: mandi price API · weather API · Diwali festival demand model</p>
-          </div>
-          <div class="card">
-            <div class="section-title"><span data-i18n="supply_map">Supply balance map — Maharashtra</span></div>
-            <p class="label" data-i18n="supply_sub">AI distributes crops across villages to prevent overproduction</p>
-            <table class="crop-table" style="margin-top:16px;">
-              <thead><tr><th>Village</th><th>AI Recommendation</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td>Nashik A</td><td>Onion</td><td><span class="badge up">Assigned</span></td></tr>
-                <tr><td>Nashik B</td><td>Tomato</td><td><span class="badge up">Assigned</span></td></tr>
-                <tr><td>Ahmednagar</td><td>Potato</td><td><span class="badge info">Pending</span></td></tr>
-                <tr><td>Solapur</td><td>Wheat</td><td><span class="badge up">Assigned</span></td></tr>
-                <tr><td>Satara</td><td>Brinjal</td><td><span class="badge warn">Review</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== SECTION: CROP AI ===== -->
-      <section class="section" id="s-crop">
-        <div class="grid2">
-          <div class="card">
-            <div class="section-title" data-i18n="crop_ai_title">Crop recommendation AI</div>
-            <p class="label" data-i18n="farmer_profile" style="margin-bottom:16px;">Farmer profile</p>
-            <div class="form-grid">
-              <div>
-                <label class="label" data-i18n="soil_type">Soil type</label>
-                <select class="input-field" id="soil" required>
-                  <option value="" disabled selected>Select Soil…</option>
-                  <option value="black">Black cotton</option>
-                  <option value="red">Red laterite</option>
-                  <option value="alluvial">Alluvial</option>
-                </select>
-              </div>
-              <div>
-                <label class="label" data-i18n="water_avail">Water availability</label>
-                <select class="input-field" id="water" required>
-                  <option value="" disabled selected>Select Water Level…</option>
-                  <option value="low">Low (rainfed)</option>
-                  <option value="medium">Medium (borewell)</option>
-                  <option value="high">High (canal)</option>
-                </select>
-              </div>
-              <div>
-                <label class="label" data-i18n="land_acres">Land (acres)</label>
-                <select class="input-field" id="land" required>
-                  <option value="" disabled selected>Select Area…</option>
-                  <option value="small">1–2</option>
-                  <option value="medium">2–5</option>
-                  <option value="large">5+</option>
-                </select>
+            <div class="hero-right">
+              <div class="hero-chat-label">💬 Ask AgriNet AI anything</div>
+              <div class="hero-chat-bar">
+                <input type="text" class="hero-chat-input" id="hero-chat-input" placeholder="How can I help your farm today?" onkeydown="if(event.key==='Enter')heroChat()">
+                <button class="hero-chat-send" onclick="heroChat()"><i class="fa-solid fa-paper-plane"></i></button>
               </div>
             </div>
-            <button class="run-btn" id="run-btn" onclick="runCropAI()">
-              <i class="fa-solid fa-microchip"></i> <span data-i18n="run_ai_btn">Run AI recommendation</span>
-            </button>
-            <div id="crop-result" style="display:none;">
-              <div class="result-header">
-                <span class="result-label">Top AI Match</span>
-                <span class="result-crop" id="rec-crop"></span>
-              </div>
-              <p class="result-reason" id="rec-reason"></p>
-            </div>
-          </div>
-          <div class="card">
-            <div class="section-title">Ranked crop analysis</div>
-            <table class="crop-table">
-              <thead><tr><th>Crop</th><th>Score</th><th>Fit</th><th>Est. Profit/ac</th><th></th></tr></thead>
-              <tbody id="crop-table-body">
-                <tr><td colspan="5" style="text-align:center;color:var(--color-text-sec);padding:40px;">
-                  Run the AI to see ranked results
-                </td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== SECTION: TRANSPORT POOL ===== -->
-      <section class="section" id="s-transport">
-        <div class="grid2">
-          <div class="card">
-            <div class="section-title"><span data-i18n="pool_title">Farmers in your pool area</span></div>
-            <p class="label" style="margin-bottom:16px;" data-i18n="pool_sub">Click farmers to add to transport pool</p>
-            <div class="farmer-list" id="farmer-list">
-              <div class="farmer-card" onclick="selectFarmer(this)">
-                <div class="farmer-avatar" style="background:linear-gradient(135deg,#E8A838,#C47F17);">RP</div>
-                <div class="farmer-name">Raju Patil</div>
-                <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 3.2 km</div>
-                <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Tomato · 2 acres</div>
-              </div>
-              <div class="farmer-card" onclick="selectFarmer(this)">
-                <div class="farmer-avatar" style="background:linear-gradient(135deg,#7C6BB1,#5A4D8A);">SD</div>
-                <div class="farmer-name">Sunita Dange</div>
-                <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 4.1 km</div>
-                <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Onion · 1.5 acres</div>
-              </div>
-              <div class="farmer-card" onclick="selectFarmer(this)">
-                <div class="farmer-avatar" style="background:linear-gradient(135deg,#1A8D68,#0E5F46);">MY</div>
-                <div class="farmer-name">Mohan Yadav</div>
-                <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 5.8 km</div>
-                <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Tomato · 3 acres</div>
-              </div>
-              <div class="farmer-card" onclick="selectFarmer(this)">
-                <div class="farmer-avatar" style="background:linear-gradient(135deg,#C14646,#993636);">LB</div>
-                <div class="farmer-name">Lakshmi Bai</div>
-                <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 6.4 km</div>
-                <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Brinjal · 1 acre</div>
-              </div>
-            </div>
-            <div class="selected-count" id="selected-count">0 farmers selected</div>
-            <button class="run-btn" id="pool-btn" onclick="calcPool()" style="width:100%;justify-content:center;">
-              <i class="fa-solid fa-truck-ramp-box"></i> <span data-i18n="calc_pool_btn">Calculate shared transport</span>
-            </button>
-          </div>
-          <div class="card">
-            <div class="section-title">Transport cost comparison</div>
-            <div class="bar-row"><div class="bar-label">Individual</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--color-down);"></div></div><div class="bar-val" style="color:var(--color-down);">₹4,200</div></div>
-            <div class="bar-row"><div class="bar-label">Pool Rate</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--color-primary);" id="pool-bar"></div></div><div class="bar-val" style="color:var(--color-primary);" id="pool-val">—</div></div>
-            <div class="pool-savings-box" id="pool-note">
-              <i class="fa-solid fa-circle-info"></i> Select farmers above to compute pooled cost
-            </div>
-            <div class="pool-map">
-              <div class="pin" style="top:40%;left:45%"><div class="pin-dot pin-pulse" style="background:var(--color-primary);"></div><div class="pin-label"><i class="fa-solid fa-store"></i> Mandi</div></div>
-              <div class="pin" style="top:20%;left:25%"><div class="pin-dot" style="background:var(--color-warn);"></div><div class="pin-label">Raju</div></div>
-              <div class="pin" style="top:60%;left:20%"><div class="pin-dot" style="background:var(--color-warn);"></div><div class="pin-label">Sunita</div></div>
-              <div class="pin" style="top:15%;left:65%"><div class="pin-dot" style="background:var(--color-warn);"></div><div class="pin-label">Mohan</div></div>
-              <div class="pin" style="top:70%;left:70%"><div class="pin-dot" style="background:var(--color-warn);"></div><div class="pin-label">Lakshmi</div></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== SECTION: SPOILAGE AI ===== -->
-      <section class="section" id="s-spoilage">
-        <div class="grid2">
-          <div class="card">
-            <div class="section-title"><span data-i18n="spoilage_title">Spoilage risk prediction</span></div>
-            <p class="label" style="margin-bottom:16px;" data-i18n="spoilage_sub">Current shipments en route — AI monitors temperature &amp; humidity</p>
-            <div class="spoilage-item"><div class="spoilage-crop">Tomato<br><span class="spoilage-meta">2.4 T · 6h transit</span></div><div class="risk-bar"><div class="risk-fill risk-high" style="width:78%;"></div></div><div class="risk-val risk-text-high">78%</div><span class="badge down">Reroute</span></div>
-            <div class="spoilage-item"><div class="spoilage-crop">Onion<br><span class="spoilage-meta">1.8 T · 4h transit</span></div><div class="risk-bar"><div class="risk-fill risk-med" style="width:42%;"></div></div><div class="risk-val risk-text-med">42%</div><span class="badge warn">Monitor</span></div>
-            <div class="spoilage-item"><div class="spoilage-crop">Potato<br><span class="spoilage-meta">3.1 T · 2h transit</span></div><div class="risk-bar"><div class="risk-fill risk-low" style="width:12%;"></div></div><div class="risk-val risk-text-low">12%</div><span class="badge up">OK</span></div>
-            <div class="spoilage-item"><div class="spoilage-crop">Brinjal<br><span class="spoilage-meta">0.9 T · 8h transit</span></div><div class="risk-bar"><div class="risk-fill risk-high" style="width:91%;"></div></div><div class="risk-val risk-text-high">91%</div><span class="badge down">Urgent</span></div>
-          </div>
-          <div class="card">
-            <div class="section-title"><span data-i18n="spoilage_intervention">AI intervention — brinjal shipment</span></div>
-            <div class="alert-box alert-danger">
-              <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-              <div><div class="alert-title" data-i18n="spoilage_alert_title">High spoilage risk detected</div><div class="alert-desc">Brinjal · 0.9T · 8h to Pune central mandi<br>Temperature: 34°C · Humidity: 72%</div></div>
-            </div>
-            <p class="label" style="margin-top:20px;margin-bottom:12px;" data-i18n="spoilage_suggestions">AI suggestions</p>
-            <div class="step-card"><div class="step-num">1</div><div class="step-info"><h4 data-i18n="spoilage_s1_title">Reroute to Pimpri-Chinchwad mandi</h4><p>2.1h closer · saves ₹1,200 loss risk</p></div></div>
-            <div class="step-card"><div class="step-num">2</div><div class="step-info"><h4 data-i18n="spoilage_s2_title">Alert nearby buyer: Raj Wholesale</h4><p>Will buy at ₹18/kg within 3h</p></div></div>
-            <div class="step-card"><div class="step-num">3</div><div class="step-info"><h4 data-i18n="spoilage_s3_title">Cold storage option nearby</h4><p>Nashik cold store · 4 km · ₹80/day</p></div></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== SECTION: BLOCKCHAIN ===== -->
-      <section class="section" id="s-blockchain">
-        <div class="grid2">
-          <div class="card">
-            <div class="section-title"><span data-i18n="bc_trace">Supply chain — blockchain trace</span></div>
-            <p class="label" style="margin-bottom:20px;" data-i18n="bc_shipment">Shipment #TN-2024-8821 · Tomato · Nashik → Pune</p>
-            <div class="timeline">
-              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Farm recorded <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Raju Patil · Nashik · 2024-11-01 06:12</p><code>Hash: 0xa3f9…c142</code></div></div>
-              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Weighed &amp; graded <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>2.4T · Grade A · 2024-11-01 08:30</p><code>Hash: 0xb72d…f381</code></div></div>
-              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Transport dispatched <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Truck MH-15-AB-4421 · 2024-11-01 09:00</p><code>Hash: 0xc91e…2a07</code></div></div>
-              <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Arrived at mandi <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Pune APMC · ₹22/kg · 2024-11-01 14:45</p><code>Hash: 0xd44a…9b53</code></div></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="section-title"><span data-i18n="bc_fraud">Fraud prevention alerts</span></div>
-            <div class="alert-box alert-success" style="margin-bottom:16px;">
-              <div class="alert-icon"><i class="fa-solid fa-circle-check"></i></div>
-              <div><div class="alert-title">No anomalies detected</div><div class="alert-desc">Shipment #TN-2024-8821 is fully verified</div></div>
-            </div>
-            <p class="label" style="margin-bottom:12px;">Recent fraud flags (other shipments)</p>
-            <div class="step-card" style="border-color:rgba(214,69,69,0.2);"><div class="step-num" style="background:rgba(214,69,69,0.08);color:var(--color-down);">!</div><div class="step-info"><h4>Weight mismatch — Shipment #ON-8810</h4><p>Declared 1.8T · Arrived 1.4T · Flagged</p></div></div>
-            <div class="step-card" style="border-color:rgba(245,158,11,0.2);"><div class="step-num" style="background:rgba(245,158,11,0.08);color:var(--color-warn);">?</div><div class="step-info"><h4>Price below mandi rate — #PT-8794</h4><p>Sold ₹6/kg vs mandi avg ₹11/kg · Alert sent</p></div></div>
-            <div class="info-well"><i class="fa-solid fa-lock"></i> Immutable records prevent middlemen from manipulating prices or weights</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== SECTION: AI MODELS ===== -->
-      <section class="section" id="s-aimodels">
-        <div class="ml-status-bar" id="ml-status-bar">
-          <span id="ml-status-dot" class="ml-dot checking"></span>
-          <span id="ml-status-text">Checking ML service…</span>
-          <span class="ml-model-badge"><i class="fa-solid fa-microchip"></i> FastAPI · port 8000</span>
-        </div>
-
-        <div class="grid2" style="margin-bottom:20px;">
-          <!-- Demand Forecast Chart -->
-          <div class="card">
-            <div class="section-title"><i class="fa-solid fa-chart-line" style="color:var(--color-primary);margin-right:8px;"></i>Demand Forecast — Time Series</div>
-            <p class="label" style="margin-bottom:14px;">ARIMA-style model · Agmarknet + Weather + Festival signals</p>
-            <canvas id="demand-canvas" width="460" height="180" style="width:100%;border-radius:8px;"></canvas>
-            <div id="forecast-legend" class="forecast-legend"></div>
           </div>
 
-          <!-- Crop Recommendation ML -->
-          <div class="card">
-            <div class="section-title"><i class="fa-solid fa-tree" style="color:var(--color-primary);margin-right:8px;"></i>Random Forest — Crop Recommendation</div>
-            <p class="label" style="margin-bottom:14px;">sklearn · 100 estimators · Feature importance analysis</p>
-            <div class="form-grid">
-              <div>
-                <label class="label">Soil type</label>
-                <select class="input-field" id="ml-soil">
-                  <option value="">Select soil…</option>
-                  <option value="black">Black cotton</option>
-                  <option value="red">Red laterite</option>
-                  <option value="alluvial">Alluvial</option>
-                  <option value="sandy">Sandy</option>
-                  <option value="clay">Clay</option>
-                </select>
+          <!-- KPI Row -->
+          <div class="grid4">
+            <div class="card kpi-card kpi-green">
+              <div class="kpi-icon-pill" style="background:rgba(61,107,53,0.12);color:var(--c-primary);">
+                <i class="fa-solid fa-arrow-trend-up"></i>
               </div>
-              <div>
-                <label class="label">Water level</label>
-                <select class="input-field" id="ml-water">
-                  <option value="">Select…</option>
-                  <option value="low">Low (rainfed)</option>
-                  <option value="medium">Medium (borewell)</option>
-                  <option value="high">High (canal)</option>
-                </select>
+              <div class="kpi-label" data-i18n="demand_signal">Demand Signal — Pune</div>
+              <div class="metric green">Tomato ↑</div>
+              <span class="badge up">+34% next 30d</span>
+            </div>
+            <div class="card kpi-card kpi-blue">
+              <div class="kpi-icon-pill" style="background:rgba(37,99,235,0.10);color:var(--c-info);">
+                <i class="fa-solid fa-users"></i>
               </div>
-              <div>
-                <label class="label">Land size</label>
-                <select class="input-field" id="ml-land">
-                  <option value="">Select…</option>
-                  <option value="small">1–2 acres</option>
-                  <option value="medium">2–5 acres</option>
-                  <option value="large">5+ acres</option>
-                </select>
+              <div class="kpi-label" data-i18n="farmers_connected">Farmers Connected</div>
+              <div class="metric" id="counter-farmers">2,847</div>
+              <span class="badge info"><i class="fa-solid fa-user-plus"></i> +12 today</span>
+            </div>
+            <div class="card kpi-card kpi-green">
+              <div class="kpi-icon-pill" style="background:rgba(61,107,53,0.12);color:var(--c-primary);">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+              </div>
+              <div class="kpi-label" data-i18n="profit_increase">Avg Profit Increase</div>
+              <div class="metric green">+62%</div>
+              <span class="badge up">vs last season</span>
+            </div>
+            <div class="card kpi-card kpi-amber">
+              <div class="kpi-icon-pill" style="background:rgba(196,127,23,0.10);color:var(--c-warn);">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div class="kpi-label" data-i18n="spoilage_prevented">Spoilage Prevented</div>
+              <div class="metric">18.4 T</div>
+              <span class="badge warn">this month</span>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="section-title"><span data-i18n="forecast">Live Demand Forecast — Next 30 Days</span></div>
+              <div class="bar-row"><div class="bar-label">Tomato</div><div class="bar-track"><div class="bar-fill" data-width="87" style="width:0%;background:var(--c-primary);"></div></div><div class="bar-val" style="color:var(--c-primary);">+87%</div></div>
+              <div class="bar-row"><div class="bar-label">Onion</div><div class="bar-track"><div class="bar-fill" data-width="54" style="width:0%;background:var(--c-warn);"></div></div><div class="bar-val" style="color:var(--c-warn);">+54%</div></div>
+              <div class="bar-row"><div class="bar-label">Potato</div><div class="bar-track"><div class="bar-fill" data-width="43" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val" style="color:#6E7B8B;">+43%</div></div>
+              <div class="bar-row"><div class="bar-label">Wheat</div><div class="bar-track"><div class="bar-fill" data-width="18" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val" style="color:#6E7B8B;">+18%</div></div>
+              <div class="bar-row"><div class="bar-label">Brinjal</div><div class="bar-track"><div class="bar-fill" data-width="31" style="width:0%;background:#6E7B8B;"></div></div><div class="bar-val" style="color:#6E7B8B;">+31%</div></div>
+              <p class="footnote" data-i18n="forecast_sub">Sources: mandi price API · weather API · Diwali festival demand model</p>
+            </div>
+            <div class="card">
+              <div class="section-title"><span data-i18n="supply_map">Supply Balance Map — Maharashtra</span></div>
+              <p class="label" data-i18n="supply_sub">AI distributes crops across villages to prevent overproduction</p>
+              <table class="crop-table" style="margin-top:16px;">
+                <thead><tr><th>Village</th><th>AI Recommendation</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Nashik A</td><td>Onion</td><td><span class="badge up">Assigned</span></td></tr>
+                  <tr><td>Nashik B</td><td>Tomato</td><td><span class="badge up">Assigned</span></td></tr>
+                  <tr><td>Ahmednagar</td><td>Potato</td><td><span class="badge info">Pending</span></td></tr>
+                  <tr><td>Solapur</td><td>Wheat</td><td><span class="badge up">Assigned</span></td></tr>
+                  <tr><td>Satara</td><td>Brinjal</td><td><span class="badge warn">Review</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SECTION: CROP AI ===== -->
+        <section class="section" id="s-crop">
+          <div class="grid2">
+            <div class="card">
+              <div class="section-title" data-i18n="crop_ai_title">Crop Recommendation AI</div>
+              <p class="label" data-i18n="farmer_profile" style="margin-bottom:16px;">Farmer profile</p>
+              <div class="form-grid">
+                <div>
+                  <label class="label" data-i18n="soil_type">Soil type</label>
+                  <select class="input-field" id="soil" required>
+                    <option value="" disabled selected>Select Soil…</option>
+                    <option value="black">Black cotton</option>
+                    <option value="red">Red laterite</option>
+                    <option value="alluvial">Alluvial</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" data-i18n="water_avail">Water availability</label>
+                  <select class="input-field" id="water" required>
+                    <option value="" disabled selected>Select Water Level…</option>
+                    <option value="low">Low (rainfed)</option>
+                    <option value="medium">Medium (borewell)</option>
+                    <option value="high">High (canal)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" data-i18n="land_acres">Land (acres)</label>
+                  <select class="input-field" id="land" required>
+                    <option value="" disabled selected>Select Area…</option>
+                    <option value="small">1–2</option>
+                    <option value="medium">2–5</option>
+                    <option value="large">5+</option>
+                  </select>
+                </div>
+              </div>
+              <button class="run-btn" id="run-btn" onclick="runCropAI()" style="width:100%;justify-content:center;">
+                <i class="fa-solid fa-microchip"></i> <span data-i18n="run_ai_btn">Run AI Recommendation</span>
+              </button>
+              <div id="crop-result" style="display:none;">
+                <div class="result-header">
+                  <span class="result-label">Top AI Match</span>
+                  <span class="result-crop" id="rec-crop"></span>
+                </div>
+                <p class="result-reason" id="rec-reason"></p>
               </div>
             </div>
-            <button class="run-btn" id="ml-run-btn" onclick="runMLCrop()" style="width:100%;justify-content:center;">
-              <i class="fa-solid fa-flask"></i> Run ML Model
-            </button>
-            <div id="ml-crop-results" style="display:none;margin-top:16px;"></div>
-            <!-- Feature Importance -->
-            <div id="ml-feature-box" style="display:none;margin-top:14px;">
-              <div class="label" style="margin-bottom:8px;">Feature importance (RF)</div>
-              <div id="ml-fi-bars"></div>
+            <div class="card">
+              <div class="section-title">Ranked Crop Analysis</div>
+              <table class="crop-table">
+                <thead><tr><th>Crop</th><th>Score</th><th>Fit</th><th>Est. Profit/ac</th><th></th></tr></thead>
+                <tbody id="crop-table-body">
+                  <tr><td colspan="5" style="text-align:center;color:var(--c-text-sec);padding:40px;">
+                    Run the AI to see ranked results
+                  </td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Supply Balancer -->
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <div class="section-title" style="margin-bottom:0;"><i class="fa-solid fa-scale-balanced" style="color:var(--color-primary);margin-right:8px;"></i>AI Supply Balancer — Core Innovation</div>
-            <button class="run-btn" id="sb-btn" onclick="runSupplyBalancer()" style="padding:8px 18px;font-size:13px;">
-              <i class="fa-solid fa-rotate"></i> Run Balancer
-            </button>
-          </div>
-          <p class="label" style="margin-bottom:16px;">Prevents overproduction by distributing optimal crops across villages · Entropy-based balance score</p>
-          <div id="sb-results">
-            <div style="text-align:center;color:var(--color-text-sec);padding:32px;font-size:13px;">
-              <i class="fa-solid fa-scale-balanced" style="font-size:24px;margin-bottom:10px;display:block;opacity:0.4;"></i>
-              Click "Run Balancer" to see AI regional crop distribution
+        <!-- ===== SECTION: TRANSPORT POOL ===== -->
+        <section class="section" id="s-transport">
+          <div class="grid2">
+            <div class="card">
+              <div class="section-title"><span data-i18n="pool_title">Farmers in Your Pool Area</span></div>
+              <p class="label" style="margin-bottom:16px;" data-i18n="pool_sub">Click farmers to add to transport pool</p>
+              <div class="farmer-list" id="farmer-list">
+                <div class="farmer-card" onclick="selectFarmer(this)">
+                  <div class="farmer-avatar" style="background:linear-gradient(135deg,#E8A838,#C47F17);">RP</div>
+                  <div class="farmer-name">Raju Patil</div>
+                  <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 3.2 km</div>
+                  <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Tomato · 2 acres</div>
+                </div>
+                <div class="farmer-card" onclick="selectFarmer(this)">
+                  <div class="farmer-avatar" style="background:linear-gradient(135deg,#7C6BB1,#5A4D8A);">SD</div>
+                  <div class="farmer-name">Sunita Dange</div>
+                  <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 4.1 km</div>
+                  <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Onion · 1.5 acres</div>
+                </div>
+                <div class="farmer-card" onclick="selectFarmer(this)">
+                  <div class="farmer-avatar" style="background:linear-gradient(135deg,#3D6B35,#2D5228);">MY</div>
+                  <div class="farmer-name">Mohan Yadav</div>
+                  <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 5.8 km</div>
+                  <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Tomato · 3 acres</div>
+                </div>
+                <div class="farmer-card" onclick="selectFarmer(this)">
+                  <div class="farmer-avatar" style="background:linear-gradient(135deg,#C14646,#993636);">LB</div>
+                  <div class="farmer-name">Lakshmi Bai</div>
+                  <div class="farmer-loc"><i class="fa-solid fa-location-dot"></i> Nashik, 6.4 km</div>
+                  <div class="farmer-crop"><i class="fa-solid fa-leaf"></i> Brinjal · 1 acre</div>
+                </div>
+              </div>
+              <div class="selected-count" id="selected-count">0 farmers selected</div>
+              <button class="run-btn" id="pool-btn" onclick="calcPool()" style="width:100%;justify-content:center;">
+                <i class="fa-solid fa-truck-ramp-box"></i> <span data-i18n="calc_pool_btn">Calculate Shared Transport</span>
+              </button>
+            </div>
+            <div class="card">
+              <div class="section-title">Transport Cost Comparison</div>
+              <div class="bar-row"><div class="bar-label">Individual</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--c-down);"></div></div><div class="bar-val" style="color:var(--c-down);">₹4,200</div></div>
+              <div class="bar-row"><div class="bar-label">Pool Rate</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--c-primary);" id="pool-bar"></div></div><div class="bar-val" style="color:var(--c-primary);" id="pool-val">—</div></div>
+              <div class="pool-savings-box" id="pool-note">
+                <i class="fa-solid fa-circle-info" style="color:var(--c-info);"></i> Select farmers above to compute pooled cost
+              </div>
+              <div class="pool-map">
+                <div class="pin" style="top:40%;left:45%"><div class="pin-dot pin-pulse" style="background:var(--c-primary);"></div><div class="pin-label"><i class="fa-solid fa-store"></i> Mandi</div></div>
+                <div class="pin" style="top:20%;left:25%"><div class="pin-dot" style="background:var(--c-warn);"></div><div class="pin-label">Raju</div></div>
+                <div class="pin" style="top:60%;left:20%"><div class="pin-dot" style="background:var(--c-warn);"></div><div class="pin-label">Sunita</div></div>
+                <div class="pin" style="top:15%;left:65%"><div class="pin-dot" style="background:var(--c-warn);"></div><div class="pin-label">Mohan</div></div>
+                <div class="pin" style="top:70%;left:70%"><div class="pin-dot" style="background:var(--c-warn);"></div><div class="pin-label">Lakshmi</div></div>
+              </div>
             </div>
           </div>
-          <div id="sb-score-box" style="display:none;margin-top:14px;" class="info-well">
-            <i class="fa-solid fa-circle-check" style="color:var(--color-primary);"></i>
-            <span id="sb-score-text"></span>
-          </div>
-        </div>
+        </section>
 
-        <!-- Mandi Price Feed -->
-        <div class="card" style="margin-top:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="section-title" style="margin-bottom:0;"><i class="fa-solid fa-satellite-dish" style="color:var(--color-primary);margin-right:8px;"></i>Live Mandi Price Feed</div>
-            <button class="run-btn" onclick="loadMandiPrices()" style="padding:8px 18px;font-size:13px;">
-              <i class="fa-solid fa-sync"></i> Refresh
-            </button>
-          </div>
-          <div id="mandi-grid" class="grid4" style="margin-bottom:0;">
-            <div style="text-align:center;padding:24px;color:var(--color-text-sec);font-size:13px;grid-column:1/-1;">
-              Click Refresh to load live mandi prices
+        <!-- ===== SECTION: SPOILAGE AI ===== -->
+        <section class="section" id="s-spoilage">
+          <div class="grid2">
+            <div class="card">
+              <div class="section-title"><span data-i18n="spoilage_title">Spoilage Risk Prediction</span></div>
+              <p class="label" style="margin-bottom:16px;" data-i18n="spoilage_sub">Current shipments en route — AI monitors temperature &amp; humidity</p>
+              <div class="spoilage-item"><div class="spoilage-crop">Tomato<br><span class="spoilage-meta">2.4 T · 6h transit</span></div><div class="risk-bar"><div class="risk-fill risk-high" style="width:78%;"></div></div><div class="risk-val risk-text-high">78%</div><span class="badge down">Reroute</span></div>
+              <div class="spoilage-item"><div class="spoilage-crop">Onion<br><span class="spoilage-meta">1.8 T · 4h transit</span></div><div class="risk-bar"><div class="risk-fill risk-med" style="width:42%;"></div></div><div class="risk-val risk-text-med">42%</div><span class="badge warn">Monitor</span></div>
+              <div class="spoilage-item"><div class="spoilage-crop">Potato<br><span class="spoilage-meta">3.1 T · 2h transit</span></div><div class="risk-bar"><div class="risk-fill risk-low" style="width:12%;"></div></div><div class="risk-val risk-text-low">12%</div><span class="badge up">OK</span></div>
+              <div class="spoilage-item"><div class="spoilage-crop">Brinjal<br><span class="spoilage-meta">0.9 T · 8h transit</span></div><div class="risk-bar"><div class="risk-fill risk-high" style="width:91%;"></div></div><div class="risk-val risk-text-high">91%</div><span class="badge down">Urgent</span></div>
+            </div>
+            <div class="card">
+              <div class="section-title"><span data-i18n="spoilage_intervention">AI Intervention — Brinjal Shipment</span></div>
+              <div class="alert-box alert-danger">
+                <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div><div class="alert-title" data-i18n="spoilage_alert_title">High spoilage risk detected</div><div class="alert-desc">Brinjal · 0.9T · 8h to Pune central mandi<br>Temperature: 34°C · Humidity: 72%</div></div>
+              </div>
+              <p class="label" style="margin-top:20px;margin-bottom:12px;" data-i18n="spoilage_suggestions">AI suggestions</p>
+              <div class="step-card"><div class="step-num">1</div><div class="step-info"><h4 data-i18n="spoilage_s1_title">Reroute to Pimpri-Chinchwad mandi</h4><p>2.1h closer · saves ₹1,200 loss risk</p></div></div>
+              <div class="step-card"><div class="step-num">2</div><div class="step-info"><h4 data-i18n="spoilage_s2_title">Alert nearby buyer: Raj Wholesale</h4><p>Will buy at ₹18/kg within 3h</p></div></div>
+              <div class="step-card"><div class="step-num">3</div><div class="step-info"><h4 data-i18n="spoilage_s3_title">Cold storage option nearby</h4><p>Nashik cold store · 4 km · ₹80/day</p></div></div>
             </div>
           </div>
-          <div id="mandi-weather" style="display:none;margin-top:14px;" class="info-well">
-            <i class="fa-solid fa-cloud-sun"></i> <span id="mandi-weather-text"></span>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ===== SECTION: VOICE AI ===== -->
-      <section class="section" id="s-voice">
-        <div class="grid2">
+        <!-- ===== SECTION: BLOCKCHAIN ===== -->
+        <section class="section" id="s-blockchain">
+          <div class="grid2">
+            <div class="card">
+              <div class="section-title"><span data-i18n="bc_trace">Supply Chain — Blockchain Trace</span></div>
+              <p class="label" style="margin-bottom:20px;" data-i18n="bc_shipment">Shipment #TN-2024-8821 · Tomato · Nashik → Pune</p>
+              <div class="timeline">
+                <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Farm recorded <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Raju Patil · Nashik · 2024-11-01 06:12</p><code>Hash: 0xa3f9…c142</code></div></div>
+                <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Weighed &amp; graded <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>2.4T · Grade A · 2024-11-01 08:30</p><code>Hash: 0xb72d…f381</code></div></div>
+                <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Transport dispatched <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Truck MH-15-AB-4421 · 2024-11-01 09:00</p><code>Hash: 0xc91e…2a07</code></div></div>
+                <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-content"><h4>Arrived at mandi <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h4><p>Pune APMC · ₹22/kg · 2024-11-01 14:45</p><code>Hash: 0xd44a…9b53</code></div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="section-title"><span data-i18n="bc_fraud">Fraud Prevention Alerts</span></div>
+              <div class="alert-box alert-success" style="margin-bottom:16px;">
+                <div class="alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="alert-title">No anomalies detected</div><div class="alert-desc">Shipment #TN-2024-8821 is fully verified</div></div>
+              </div>
+              <p class="label" style="margin-bottom:12px;">Recent fraud flags (other shipments)</p>
+              <div class="step-card" style="border-color:rgba(193,70,70,0.2);"><div class="step-num" style="background:rgba(193,70,70,0.08);color:var(--c-down);">!</div><div class="step-info"><h4>Weight mismatch — Shipment #ON-8810</h4><p>Declared 1.8T · Arrived 1.4T · Flagged</p></div></div>
+              <div class="step-card" style="border-color:rgba(196,127,23,0.2);"><div class="step-num" style="background:rgba(196,127,23,0.08);color:var(--c-warn);">?</div><div class="step-info"><h4>Price below mandi rate — #PT-8794</h4><p>Sold ₹6/kg vs mandi avg ₹11/kg · Alert sent</p></div></div>
+              <div class="info-well"><i class="fa-solid fa-lock" style="color:var(--c-primary);"></i> Immutable records prevent middlemen from manipulating prices or weights</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SECTION: AI MODELS ===== -->
+        <section class="section" id="s-aimodels">
+          <div class="ml-status-bar" id="ml-status-bar">
+            <span id="ml-status-dot" class="ml-dot checking"></span>
+            <span id="ml-status-text">Checking ML service…</span>
+            <span class="ml-model-badge"><i class="fa-solid fa-microchip"></i> FastAPI · port 8000</span>
+          </div>
+          <div class="grid2" style="margin-bottom:20px;">
+            <div class="card">
+              <div class="section-title"><i class="fa-solid fa-chart-line" style="color:var(--c-primary);margin-right:8px;"></i>Demand Forecast — Time Series</div>
+              <p class="label" style="margin-bottom:14px;">ARIMA-style model · Agmarknet + Weather + Festival signals</p>
+              <canvas id="demand-canvas" width="460" height="180" style="width:100%;border-radius:8px;"></canvas>
+              <div id="forecast-legend" class="forecast-legend"></div>
+            </div>
+            <div class="card">
+              <div class="section-title"><i class="fa-solid fa-tree" style="color:var(--c-primary);margin-right:8px;"></i>Random Forest — Crop Recommendation</div>
+              <p class="label" style="margin-bottom:14px;">sklearn · 100 estimators · Feature importance analysis</p>
+              <div class="form-grid">
+                <div><label class="label">Soil type</label><select class="input-field" id="ml-soil"><option value="">Select soil…</option><option value="black">Black cotton</option><option value="red">Red laterite</option><option value="alluvial">Alluvial</option><option value="sandy">Sandy</option><option value="clay">Clay</option></select></div>
+                <div><label class="label">Water level</label><select class="input-field" id="ml-water"><option value="">Select…</option><option value="low">Low (rainfed)</option><option value="medium">Medium (borewell)</option><option value="high">High (canal)</option></select></div>
+                <div><label class="label">Land size</label><select class="input-field" id="ml-land"><option value="">Select…</option><option value="small">1–2 acres</option><option value="medium">2–5 acres</option><option value="large">5+ acres</option></select></div>
+              </div>
+              <button class="run-btn" id="ml-run-btn" onclick="runMLCrop()" style="width:100%;justify-content:center;"><i class="fa-solid fa-flask"></i> Run ML Model</button>
+              <div id="ml-crop-results" style="display:none;margin-top:16px;"></div>
+              <div id="ml-feature-box" style="display:none;margin-top:14px;"><div class="label" style="margin-bottom:8px;">Feature importance (RF)</div><div id="ml-fi-bars"></div></div>
+            </div>
+          </div>
           <div class="card">
-            <div class="section-title"><span data-i18n="voice_title">Voice AI — rural farmer interface</span></div>
-            <p class="label" style="margin-bottom:16px;" data-i18n="voice_sub">Farmer asks in Hindi/Marathi — AI responds in local language</p>
-            <div class="chat-container" id="chat-container">
-              <div class="chat-msg user"><div class="avatar farmer">RF</div><div class="bubble">Kal kya bechna chahiye? Mere paas tamatar aur pyaaz dono hai.</div></div>
-              <div class="chat-msg bot"><div class="avatar ai"><i class="fa-solid fa-robot"></i></div><div class="bubble">Kal tamatar becho — Pune mandi mein demand zyada hai. Bhav ₹22–₹25/kg milega. Pyaaz 5 din baad behtar rahega.</div></div>
-              <div class="chat-msg user"><div class="avatar farmer">RF</div><div class="bubble">Transport ka kharcha kitna hoga?</div></div>
-              <div class="chat-msg bot"><div class="avatar ai"><i class="fa-solid fa-robot"></i></div><div class="bubble">Pool mein 3 aur kisaan hain aapke gaon se. Milke truck loge to sirf ₹950 lagega, akele ₹3,800 lagta. AgriNet pool se judna hai?</div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <div class="section-title" style="margin-bottom:0;"><i class="fa-solid fa-scale-balanced" style="color:var(--c-primary);margin-right:8px;"></i>AI Supply Balancer — Core Innovation</div>
+              <button class="run-btn" id="sb-btn" onclick="runSupplyBalancer()" style="padding:8px 18px;font-size:13px;"><i class="fa-solid fa-rotate"></i> Run Balancer</button>
             </div>
-            <div class="chat-input-area">
-              <input type="text" class="chat-input" id="chat-input" placeholder="Type your question in any language…" data-i18n-placeholder="chat_placeholder">
-              <button class="chat-send-btn" id="chat-send-btn" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
-              <button class="chat-mic-btn" id="mic-btn" onclick="toggleMic()"><i class="fa-solid fa-microphone"></i></button>
+            <p class="label" style="margin-bottom:16px;">Prevents overproduction by distributing optimal crops across villages · Entropy-based balance score</p>
+            <div id="sb-results"><div style="text-align:center;color:var(--c-text-sec);padding:32px;font-size:13px;"><i class="fa-solid fa-scale-balanced" style="font-size:24px;margin-bottom:10px;display:block;opacity:0.4;"></i>Click "Run Balancer" to see AI regional crop distribution</div></div>
+            <div id="sb-score-box" style="display:none;margin-top:14px;" class="info-well"><i class="fa-solid fa-circle-check" style="color:var(--c-primary);"></i><span id="sb-score-text"></span></div>
+          </div>
+          <div class="card" style="margin-top:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div class="section-title" style="margin-bottom:0;"><i class="fa-solid fa-satellite-dish" style="color:var(--c-primary);margin-right:8px;"></i>Live Mandi Price Feed</div>
+              <button class="run-btn" onclick="loadMandiPrices()" style="padding:8px 18px;font-size:13px;"><i class="fa-solid fa-sync"></i> Refresh</button>
+            </div>
+            <div id="mandi-grid" class="grid4" style="margin-bottom:0;"><div style="text-align:center;padding:24px;color:var(--c-text-sec);font-size:13px;grid-column:1/-1;">Click Refresh to load live mandi prices</div></div>
+            <div id="mandi-weather" style="display:none;margin-top:14px;" class="info-well"><i class="fa-solid fa-cloud-sun"></i> <span id="mandi-weather-text"></span></div>
+          </div>
+        </section>
+
+        <!-- ===== SECTION: VOICE AI ===== -->
+        <section class="section" id="s-voice">
+          <div class="grid2">
+            <div class="card">
+              <div class="section-title"><span data-i18n="voice_title">Voice AI — Rural Farmer Interface</span></div>
+              <p class="label" style="margin-bottom:16px;" data-i18n="voice_sub">Farmer asks in Hindi/Marathi — AI responds in local language</p>
+              <div class="chat-container" id="chat-container">
+                <div class="chat-msg user"><div class="avatar farmer">RF</div><div class="bubble">Kal kya bechna chahiye? Mere paas tamatar aur pyaaz dono hai.</div></div>
+                <div class="chat-msg bot"><div class="avatar ai"><i class="fa-solid fa-robot"></i></div><div class="bubble">Kal tamatar becho — Pune mandi mein demand zyada hai. Bhav ₹22–₹25/kg milega. Pyaaz 5 din baad behtar rahega.</div></div>
+                <div class="chat-msg user"><div class="avatar farmer">RF</div><div class="bubble">Transport ka kharcha kitna hoga?</div></div>
+                <div class="chat-msg bot"><div class="avatar ai"><i class="fa-solid fa-robot"></i></div><div class="bubble">Pool mein 3 aur kisaan hain aapke gaon se. Milke truck loge to sirf ₹950 lagega, akele ₹3,800 lagta. AgriNet pool se judna hai?</div></div>
+              </div>
+              <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Type your question in any language…" data-i18n-placeholder="chat_placeholder">
+                <button class="chat-send-btn" id="chat-send-btn" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+                <button class="chat-mic-btn" id="mic-btn" onclick="toggleMic()"><i class="fa-solid fa-microphone"></i></button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="section-title"><span data-i18n="impact_title">Impact — Before vs After AgriNet</span></div>
+              <div class="profit-compare">
+                <div class="compare-box before"><div class="compare-label"><i class="fa-solid fa-arrow-down"></i> Before AgriNet</div><div class="compare-val">₹28K</div><div class="compare-desc">avg per acre/season</div></div>
+                <div class="compare-box after"><div class="compare-label"><i class="fa-solid fa-arrow-up"></i> With AgriNet</div><div class="compare-val">₹61K</div><div class="compare-desc">avg per acre/season</div></div>
+              </div>
+              <div style="margin-top:24px;">
+                <div class="bar-row"><div class="bar-label" style="width:120px;">Spoilage loss</div><div class="bar-track"><div class="bar-fill" data-width="25" style="width:0%;background:var(--c-primary);"></div></div><div class="bar-val" style="color:var(--c-primary);">−75%</div></div>
+                <div class="bar-row"><div class="bar-label" style="width:120px;">Transport cost</div><div class="bar-track"><div class="bar-fill" data-width="40" style="width:0%;background:var(--c-primary);"></div></div><div class="bar-val" style="color:var(--c-primary);">−60%</div></div>
+                <div class="bar-row"><div class="bar-label" style="width:120px;">Middlemen cuts</div><div class="bar-track"><div class="bar-fill" data-width="30" style="width:0%;background:var(--c-primary);"></div></div><div class="bar-val" style="color:var(--c-primary);">−70%</div></div>
+                <div class="bar-row"><div class="bar-label" style="width:120px;">Market access</div><div class="bar-track"><div class="bar-fill" data-width="90" style="width:0%;background:var(--c-primary);"></div></div><div class="bar-val" style="color:var(--c-primary);">+3×</div></div>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <div class="section-title"><span data-i18n="impact_title">Impact — before vs after AgriNet</span></div>
-            <div class="profit-compare">
-              <div class="compare-box before"><div class="compare-label"><i class="fa-solid fa-arrow-down"></i> Before AgriNet</div><div class="compare-val">₹28K</div><div class="compare-desc">avg per acre/season</div></div>
-              <div class="compare-box after"><div class="compare-label"><i class="fa-solid fa-arrow-up"></i> With AgriNet</div><div class="compare-val">₹61K</div><div class="compare-desc">avg per acre/season</div></div>
+        </section>
+
+        <!-- ===== SECTION: TECH STACK ===== -->
+        <section class="section" id="s-techstack">
+          <div class="ts-hero">
+            <div class="ts-hero-badge"><i class="fa-solid fa-layer-group"></i> Full Stack Architecture</div>
+            <h1 class="ts-hero-title">AgriNet AI — Technology Stack</h1>
+            <p class="ts-hero-sub">End-to-end platform connecting Indian farmers with AI-powered crop intelligence, market data, and supply chain transparency.</p>
+          </div>
+          <div class="arch-diagram card" style="margin-bottom:20px;overflow:hidden;">
+            <div class="section-title" style="margin-bottom:20px;"><i class="fa-solid fa-diagram-project" style="color:var(--c-primary);margin-right:8px;"></i>System Architecture</div>
+            <div class="arch-flow">
+              <div class="arch-node arch-mobile"><div class="arch-node-icon">📱</div><div class="arch-node-title">Flutter Mobile</div><div class="arch-node-sub">Android · iOS</div><div class="arch-tags"><span class="arch-tag">Dart</span><span class="arch-tag">Voice AI</span></div></div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node arch-flask"><div class="arch-node-icon">🐍</div><div class="arch-node-title">Flask API</div><div class="arch-node-sub">Port 5000</div><div class="arch-tags"><span class="arch-tag">JWT Auth</span><span class="arch-tag">SQLite</span></div></div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node arch-fastapi"><div class="arch-node-icon">⚡</div><div class="arch-node-title">FastAPI ML</div><div class="arch-node-sub">Port 8000</div><div class="arch-tags"><span class="arch-tag">sklearn</span><span class="arch-tag">numpy</span></div></div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node arch-ml"><div class="arch-node-icon">🤖</div><div class="arch-node-title">AI / ML Models</div><div class="arch-node-sub">3 models</div><div class="arch-tags"><span class="arch-tag">Random Forest</span><span class="arch-tag">Time Series</span></div></div>
             </div>
-            <div style="margin-top:24px;">
-              <div class="bar-row"><div class="bar-label" style="width:120px;">Spoilage loss</div><div class="bar-track"><div class="bar-fill" data-width="25" style="width:0%;background:var(--color-primary);"></div></div><div class="bar-val" style="color:var(--color-primary);">−75%</div></div>
-              <div class="bar-row"><div class="bar-label" style="width:120px;">Transport cost</div><div class="bar-track"><div class="bar-fill" data-width="40" style="width:0%;background:var(--color-primary);"></div></div><div class="bar-val" style="color:var(--color-primary);">−60%</div></div>
-              <div class="bar-row"><div class="bar-label" style="width:120px;">Middlemen cuts</div><div class="bar-track"><div class="bar-fill" data-width="30" style="width:0%;background:var(--color-primary);"></div></div><div class="bar-val" style="color:var(--color-primary);">−70%</div></div>
-              <div class="bar-row"><div class="bar-label" style="width:120px;">Market access</div><div class="bar-track"><div class="bar-fill" data-width="90" style="width:0%;background:var(--color-primary);"></div></div><div class="bar-val" style="color:var(--color-primary);">+3×</div></div>
+            <div class="arch-datasources">
+              <div class="arch-ds-title">Data Integration Layer</div>
+              <div class="arch-ds-row">
+                <div class="ds-item"><i class="fa-solid fa-cloud-sun"></i><span>Weather API</span></div>
+                <div class="ds-item"><i class="fa-solid fa-store"></i><span>Mandi Prices</span></div>
+                <div class="ds-item"><i class="fa-solid fa-mountain"></i><span>Soil Data</span></div>
+                <div class="ds-item"><i class="fa-solid fa-link"></i><span>Blockchain</span></div>
+                <div class="ds-item"><i class="fa-solid fa-calendar"></i><span>Festival Calendar</span></div>
+              </div>
             </div>
           </div>
+          <div class="ts-grid">
+            <div class="ts-card ts-mobile"><div class="ts-card-header"><span class="ts-layer-badge" style="background:rgba(84,197,248,0.15);color:#54C5F8;">📱 Frontend</span></div><div class="ts-card-icon">🦋</div><h3 class="ts-card-title">Flutter</h3><p class="ts-card-desc">Cross-platform mobile app for Android/iOS. Lightweight UI for rural farmers with minimal data literacy. Supports Hindi, Marathi, and English.</p><div class="ts-features"><div class="ts-feat"><i class="fa-solid fa-check"></i> Voice AI interface</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Offline-capable UI</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Real-time ML results</div></div></div>
+            <div class="ts-card ts-backend"><div class="ts-card-header"><span class="ts-layer-badge" style="background:rgba(250,204,21,0.15);color:#FBBF24;">⚙️ Backend</span></div><div class="ts-card-icon">🐍</div><h3 class="ts-card-title">Python + FastAPI</h3><p class="ts-card-desc">High-performance FastAPI ML microservice (port 8000) + Flask REST API (port 5000). JWT authentication, rate limiting, SQLite persistence.</p><div class="ts-features"><div class="ts-feat"><i class="fa-solid fa-check"></i> Auto-generated API docs</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Pydantic validation</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Async request handling</div></div></div>
+            <div class="ts-card ts-ai"><div class="ts-card-header"><span class="ts-layer-badge" style="background:rgba(167,139,250,0.15);color:#A78BFA;">🤖 AI / ML</span></div><div class="ts-card-icon">🧬</div><h3 class="ts-card-title">sklearn + numpy</h3><p class="ts-card-desc">Three production-ready ML models: Random Forest for crop recommendation, ARIMA-style time series for demand forecasting, and the AI Supply Balancer.</p><div class="ts-features"><div class="ts-feat"><i class="fa-solid fa-check"></i> Random Forest (100 trees)</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Time series forecasting</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Entropy supply balancer</div></div></div>
+            <div class="ts-card ts-blockchain"><div class="ts-card-header"><span class="ts-layer-badge" style="background:rgba(251,146,60,0.15);color:#FB923C;">🔗 Blockchain</span></div><div class="ts-card-icon">⛓️</div><h3 class="ts-card-title">Supply Chain Trace</h3><p class="ts-card-desc">Immutable record-keeping for farm-to-market shipments. Smart contract simulation for transparency, fraud prevention, and price verification.</p><div class="ts-features"><div class="ts-feat"><i class="fa-solid fa-check"></i> Hash-verified steps</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Weight mismatch alerts</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Price anomaly detection</div></div></div>
+            <div class="ts-card ts-voice"><div class="ts-card-header"><span class="ts-layer-badge" style="background:rgba(52,211,153,0.15);color:#34D399;">🎤 Voice AI</span></div><div class="ts-card-icon">🗣️</div><h3 class="ts-card-title">Multilingual NLP</h3><p class="ts-card-desc">Speech-to-text system supporting Hindi, Marathi, and English. Enables farmers with limited digital literacy to access AI recommendations via voice.</p><div class="ts-features"><div class="ts-feat"><i class="fa-solid fa-check"></i> Hindi / Marathi / English</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Web Speech API</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Contextual responses</div></div></div>
+            <div class="ts-card ts-data"><div class="ts-card-header"><span class="ts-layer-badge" style="background:rgba(239,68,68,0.15);color:#EF4444;">📡 Data Layer</span></div><div class="ts-card-icon">🌐</div><h3 class="ts-card-title">Data Integration</h3><p class="ts-card-desc">Real-time feeds from Weather APIs, Agmarknet Mandi prices, soil databases, and festival calendar signals power the ML prediction pipeline.</p><div class="ts-features"><div class="ts-feat"><i class="fa-solid fa-check"></i> IMD Weather feed</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Agmarknet mandi prices</div><div class="ts-feat"><i class="fa-solid fa-check"></i> Festival demand signals</div></div></div>
+          </div>
+          <div class="ts-mobile-cta">
+            <div class="ts-cta-icon">📱</div>
+            <div><div class="ts-cta-title">Try the Mobile App UI</div><div class="ts-cta-sub">Interactive Flutter-style mobile interface — Dashboard, Crop AI, Voice AI, Blockchain</div></div>
+            <a href="/mobile" target="_blank" class="run-btn" style="text-decoration:none;margin-left:auto;white-space:nowrap;"><i class="fa-solid fa-mobile-screen"></i> Open Mobile UI</a>
+          </div>
+        </section>
+
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2024 AgriNet AI · Built for Indian farmers 🇮🇳</span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span class="footer-badge"><i class="fa-brands fa-flutter"></i> Flutter</span>
+          <span class="footer-badge"><i class="fa-solid fa-bolt"></i> FastAPI</span>
+          <span class="footer-badge"><i class="fa-solid fa-robot"></i> sklearn</span>
+          <span class="footer-badge"><i class="fa-solid fa-link"></i> Blockchain</span>
+          <span class="footer-badge"><i class="fa-solid fa-microphone"></i> Voice AI</span>
         </div>
-      </section>
-
-      <!-- ===== SECTION: TECH STACK ===== -->
-      <section class="section" id="s-techstack">
-        <div class="ts-hero">
-          <div class="ts-hero-badge"><i class="fa-solid fa-layer-group"></i> Full Stack Architecture</div>
-          <h1 class="ts-hero-title">AgriNet AI — Technology Stack</h1>
-          <p class="ts-hero-sub">End-to-end platform connecting Indian farmers with AI-powered crop intelligence, market data, and supply chain transparency.</p>
-        </div>
-
-        <!-- Architecture Diagram -->
-        <div class="arch-diagram card" style="margin-bottom:20px;overflow:hidden;">
-          <div class="section-title" style="margin-bottom:20px;"><i class="fa-solid fa-diagram-project" style="color:var(--color-primary);margin-right:8px;"></i>System Architecture</div>
-          <div class="arch-flow">
-            <!-- Mobile -->
-            <div class="arch-node arch-mobile">
-              <div class="arch-node-icon">📱</div>
-              <div class="arch-node-title">Flutter Mobile</div>
-              <div class="arch-node-sub">Android · iOS</div>
-              <div class="arch-tags"><span class="arch-tag">Dart</span><span class="arch-tag">Voice AI</span></div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <!-- Flask -->
-            <div class="arch-node arch-flask">
-              <div class="arch-node-icon">🐍</div>
-              <div class="arch-node-title">Flask API</div>
-              <div class="arch-node-sub">Port 5000</div>
-              <div class="arch-tags"><span class="arch-tag">JWT Auth</span><span class="arch-tag">SQLite</span></div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <!-- FastAPI ML -->
-            <div class="arch-node arch-fastapi">
-              <div class="arch-node-icon">⚡</div>
-              <div class="arch-node-title">FastAPI ML</div>
-              <div class="arch-node-sub">Port 8000</div>
-              <div class="arch-tags"><span class="arch-tag">sklearn</span><span class="arch-tag">numpy</span></div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <!-- AI Models -->
-            <div class="arch-node arch-ml">
-              <div class="arch-node-icon">🤖</div>
-              <div class="arch-node-title">AI / ML Models</div>
-              <div class="arch-node-sub">3 models</div>
-              <div class="arch-tags"><span class="arch-tag">Random Forest</span><span class="arch-tag">Time Series</span></div>
-            </div>
-          </div>
-          <!-- Data sources row -->
-          <div class="arch-datasources">
-            <div class="arch-ds-title">Data Integration Layer</div>
-            <div class="arch-ds-row">
-              <div class="ds-item"><i class="fa-solid fa-cloud-sun"></i><span>Weather API</span></div>
-              <div class="ds-item"><i class="fa-solid fa-store"></i><span>Mandi Prices</span></div>
-              <div class="ds-item"><i class="fa-solid fa-mountain"></i><span>Soil Data</span></div>
-              <div class="ds-item"><i class="fa-solid fa-link"></i><span>Blockchain</span></div>
-              <div class="ds-item"><i class="fa-solid fa-calendar"></i><span>Festival Calendar</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tech Stack Grid -->
-        <div class="ts-grid">
-          <div class="ts-card ts-mobile">
-            <div class="ts-card-header">
-              <span class="ts-layer-badge" style="background:rgba(84,197,248,0.15);color:#54C5F8;">📱 Frontend</span>
-            </div>
-            <div class="ts-card-icon">🦋</div>
-            <h3 class="ts-card-title">Flutter</h3>
-            <p class="ts-card-desc">Cross-platform mobile app for Android/iOS. Lightweight UI designed for rural farmers with minimal data literacy. Supports Hindi, Marathi, and English.</p>
-            <div class="ts-features">
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Voice AI interface</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Offline-capable UI</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Real-time ML results</div>
-            </div>
-          </div>
-
-          <div class="ts-card ts-backend">
-            <div class="ts-card-header">
-              <span class="ts-layer-badge" style="background:rgba(250,204,21,0.15);color:#FBBF24;">⚙️ Backend</span>
-            </div>
-            <div class="ts-card-icon">🐍</div>
-            <h3 class="ts-card-title">Python + FastAPI</h3>
-            <p class="ts-card-desc">High-performance FastAPI ML microservice (port 8000) + Flask REST API (port 5000). JWT authentication, rate limiting, SQLite persistence.</p>
-            <div class="ts-features">
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Auto-generated API docs</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Pydantic validation</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Async request handling</div>
-            </div>
-          </div>
-
-          <div class="ts-card ts-ai">
-            <div class="ts-card-header">
-              <span class="ts-layer-badge" style="background:rgba(167,139,250,0.15);color:#A78BFA;">🤖 AI / ML</span>
-            </div>
-            <div class="ts-card-icon">🧬</div>
-            <h3 class="ts-card-title">sklearn + numpy</h3>
-            <p class="ts-card-desc">Three production-ready ML models: Random Forest for crop recommendation, ARIMA-style time series for demand forecasting, and the AI Supply Balancer.</p>
-            <div class="ts-features">
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Random Forest (100 trees)</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Time series forecasting</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Entropy supply balancer</div>
-            </div>
-          </div>
-
-          <div class="ts-card ts-blockchain">
-            <div class="ts-card-header">
-              <span class="ts-layer-badge" style="background:rgba(251,146,60,0.15);color:#FB923C;">🔗 Blockchain</span>
-            </div>
-            <div class="ts-card-icon">⛓️</div>
-            <h3 class="ts-card-title">Supply Chain Trace</h3>
-            <p class="ts-card-desc">Immutable record-keeping for farm-to-market shipments. Smart contract simulation for transparency, fraud prevention, and price verification.</p>
-            <div class="ts-features">
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Hash-verified steps</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Weight mismatch alerts</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Price anomaly detection</div>
-            </div>
-          </div>
-
-          <div class="ts-card ts-voice">
-            <div class="ts-card-header">
-              <span class="ts-layer-badge" style="background:rgba(52,211,153,0.15);color:#34D399;">🎤 Voice AI</span>
-            </div>
-            <div class="ts-card-icon">🗣️</div>
-            <h3 class="ts-card-title">Multilingual NLP</h3>
-            <p class="ts-card-desc">Speech-to-text system supporting Hindi, Marathi, and English. Enables farmers with limited digital literacy to access AI recommendations via voice.</p>
-            <div class="ts-features">
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Hindi / Marathi / English</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Web Speech API</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Contextual responses</div>
-            </div>
-          </div>
-
-          <div class="ts-card ts-data">
-            <div class="ts-card-header">
-              <span class="ts-layer-badge" style="background:rgba(239,68,68,0.15);color:#EF4444;">📡 Data Layer</span>
-            </div>
-            <div class="ts-card-icon">🌐</div>
-            <h3 class="ts-card-title">Data Integration</h3>
-            <p class="ts-card-desc">Real-time feeds from Weather APIs, Agmarknet Mandi prices, soil databases, and festival calendar signals power the ML prediction pipeline.</p>
-            <div class="ts-features">
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> IMD Weather feed</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Agmarknet mandi prices</div>
-              <div class="ts-feat"><i class="fa-solid fa-check"></i> Festival demand signals</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mobile App Link -->
-        <div class="ts-mobile-cta">
-          <div class="ts-cta-icon">📱</div>
-          <div>
-            <div class="ts-cta-title">Try the Mobile App UI</div>
-            <div class="ts-cta-sub">Interactive Flutter-style mobile interface — Dashboard, Crop AI, Voice AI, Blockchain</div>
-          </div>
-          <a href="/mobile" target="_blank" class="run-btn" style="text-decoration:none;margin-left:auto;white-space:nowrap;">
-            <i class="fa-solid fa-mobile-screen"></i> Open Mobile UI
-          </a>
-        </div>
-      </section>
-    </main>
-
-    <footer class="app-footer">
-      <span>© 2024 AgriNet AI · Built for Indian farmers 🇮🇳</span>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <span class="footer-badge"><i class="fa-brands fa-flutter"></i> Flutter</span>
-        <span class="footer-badge"><i class="fa-solid fa-bolt"></i> FastAPI</span>
-        <span class="footer-badge"><i class="fa-solid fa-robot"></i> sklearn</span>
-        <span class="footer-badge"><i class="fa-solid fa-link"></i> Blockchain</span>
-        <span class="footer-badge"><i class="fa-solid fa-microphone"></i> Voice AI</span>
-      </div>
-    </footer>
-  </div>
+      </footer>
+    </div><!-- end .main-panel -->
+  </div><!-- end .app -->
 
   <div id="toast-container"></div>
 
   <script src="api/translations.js"></script>
   <script src="api/processor.js"></script>
+  <script src="js/sidebar.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
