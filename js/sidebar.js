@@ -123,3 +123,52 @@ function logout() {
   localStorage.removeItem('agrinet_token');
   window.location.href = '/login.html';
 }
+
+// ── Read user from Supabase JWT (stored by login.html) ──────────
+(function loadSupabaseUser() {
+  try {
+    const stored = localStorage.getItem('agrinet_user');
+    if (stored) {
+      const user = JSON.parse(stored);
+      const name = user.name || user.email?.split('@')[0] || 'Farmer';
+      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      ['user-initials','user-initials-top'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = initials;
+      });
+      const nameEl = document.getElementById('dropdown-name');
+      if (nameEl) nameEl.textContent = name;
+      const emailEl = document.getElementById('dropdown-email');
+      if (emailEl) emailEl.textContent = user.email || '';
+      return;
+    }
+    // Fallback: decode JWT
+    const token = localStorage.getItem('agrinet_token');
+    if (!token) return;
+    const parts = token.split('.');
+    if (parts.length < 2) return;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+    const name = payload.name || payload.email?.split('@')[0] || 'Farmer';
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    ['user-initials','user-initials-top'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = initials;
+    });
+  } catch(e) {}
+})();
+
+// ── Logout via Supabase ─────────────────────────────────────────
+window.logout = async function() {
+  localStorage.removeItem('agrinet_token');
+  localStorage.removeItem('agrinet_user');
+  // If Supabase client is loaded, also sign out from it
+  try {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    const sb = createClient(
+      'https://bkgvvwbukgfijamnkzsp.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrZ3Z2d2J1a2dmaWphbW5renNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDg0MDcsImV4cCI6MjA5NTE4NDQwN30.WkqxWqJL4qVXNUnQMroNLfAQ188lyXlhNLhiOu0W3YU'
+    );
+    await sb.auth.signOut();
+  } catch(e) {}
+  window.location.href = '/login.html';
+};

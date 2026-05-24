@@ -347,3 +347,119 @@
   </script>
 </body>
 </html>
+<script type="module">
+// ================================================================
+// AgriNet AI — Real Supabase Auth Integration
+// ================================================================
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL  = 'https://bkgvvwbukgfijamnkzsp.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrZ3Z2d2J1a2dmaWphbW5renNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDg0MDcsImV4cCI6MjA5NTE4NDQwN30.WkqxWqJL4qVXNUnQMroNLfAQ188lyXlhNLhiOu0W3YU';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Check if already logged in ──────────────────────────────────
+const { data: { session } } = await supabase.auth.getSession();
+if (session) window.location.href = '/index.html';
+
+// ── Save session token for sidebar.js ──────────────────────────
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    localStorage.setItem('agrinet_token', session.access_token);
+    localStorage.setItem('agrinet_user', JSON.stringify({
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.user_metadata?.name || session.user.email.split('@')[0]
+    }));
+  } else {
+    localStorage.removeItem('agrinet_token');
+    localStorage.removeItem('agrinet_user');
+  }
+});
+
+// ── OAuth: Google ───────────────────────────────────────────────
+window.loginWithGoogle = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/index.html' }
+  });
+  if (error) showError('signin', error.message);
+};
+
+// ── OAuth: GitHub ───────────────────────────────────────────────
+window.loginWithGithub = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: { redirectTo: window.location.origin + '/index.html' }
+  });
+  if (error) showError('signin', error.message);
+};
+
+// ── Email Sign In ───────────────────────────────────────────────
+window.handleSignin = async (e) => {
+  e.preventDefault();
+  const btn   = document.getElementById('signin-btn');
+  const email = document.getElementById('signin-email').value.trim();
+  const pass  = document.getElementById('signin-password').value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in…';
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    showError('signin', error.message);
+  } else {
+    localStorage.setItem('agrinet_token', data.session.access_token);
+    window.location.href = '/index.html';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+};
+
+// ── Email Sign Up ───────────────────────────────────────────────
+window.handleSignup = async (e) => {
+  e.preventDefault();
+  const btn   = document.getElementById('signup-btn');
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-password').value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating…';
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password: pass,
+    options: {
+      data: { name },
+      emailRedirectTo: window.location.origin + '/index.html'
+    }
+  });
+
+  if (error) {
+    showError('signup', error.message);
+  } else {
+    const successEl = document.getElementById('signup-success');
+    successEl.style.display = 'block';
+    successEl.innerHTML = '✅ Account created! Check your email to confirm, then sign in.';
+    setTimeout(() => showTab('signin'), 3000);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+};
+
+// ── Forgot Password ─────────────────────────────────────────────
+document.querySelector('.forgot-link')?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('signin-email').value.trim();
+  if (!email) { showError('signin', 'Enter your email first, then click forgot password.'); return; }
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-password.html'
+  });
+  if (error) showError('signin', error.message);
+  else { showError('signin', '📧 Password reset email sent! Check your inbox.'); }
+});
+</script>

@@ -6,3 +6,7 @@ __pycache__/
 agrinet.db
 .env
 .DS_Store
+.agents/
+skills-lock.json
+server.log
+*.log
